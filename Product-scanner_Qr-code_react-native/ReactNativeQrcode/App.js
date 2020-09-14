@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {RNCamera} from 'react-native-camera';
 
 // const Web3 = require('web3'); // pour se connecter sur la blockchain
 // var web3 = new Web3('ws://localhost:8546');
