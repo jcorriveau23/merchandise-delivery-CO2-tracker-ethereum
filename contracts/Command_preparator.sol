@@ -7,47 +7,58 @@ contract Command_preparator{
         mapping (string => UPCIds) UpcToIndex;
         uint numUPC;
 
+        Command[] commands;
+        uint numCommands;
+
         Traject[] trajects;
         uint numTrajects;
         
     }
 
-    struct UPC {
-        string UPC;
-        uint Weight;
+    struct UPC {                                // store the weight and volume of a specific product (UPC)
+        string UPC;// could be deleted
+        uint Weight;        
         uint Volume;
-        mapping(uint => Product) uniqueProduct;
-        uint numberProduct;
+        mapping(uint => Product) uniqueProduct; // mapping all unique instantiation of the product
+        uint numberProduct;                     // number of unique instantiation
     }
 
-    struct Product {
-        uint[] trajectID; // dynamic list of product trajects
-        uint8 size;
-    }
-
-    struct Traject {
-        uint truckID;
-        uint trajectID;
-        uint totWeight;
-        uint totVolume;
-        // uint fromID;
-        // uint toID;
-        bool done;
-        //uint co2Emission
-    }
-
-    struct UPCIds {
+    struct UPCIds {         // index of the UPC array that doesn't allowed duplication
         uint ID;
         bool isValue;
     }
 
+    struct Product {
+        uint[] commandIDs; // dynamic list of commands that id link to this unique product
+        uint8 size;
+    }
+
+    struct Command {
+        uint[] TrailerIDs;  // dynamic list of TrailerIDs taken by the command
+        uint[] TrajectIDs;  // dynamic list of trajectIDs taken by the command
+        uint8 size;         // keep tracks of the number of traject the command take parts in
+        uint totWeight;     // total weight of the command = sums of products weight
+        uint totVolume;     // total volume of the command = sums of products volume
+
+        bool done;          // 'true' when the command is ready to be charge
+        //uint co2Emission
+    }
+
+    struct Traject {
+        uint truckID;       // truck that drive the command
+        uint totWeight;     // total weight of the traject = sums of commands total weight
+        uint totVolume;     // total volume of the traject = sums of commands total volume
+        // uint fromID;
+        // uint toID;
+
+        bool done;          // true when the traject is done => co2Emission is valid
+        uint co2Emission;   // only valid when => done = true
+    }
+
+
+
     Data D;
 
-    // function init_traject(uint _TruckID) public returns(uint id){
-    //     Traject memory newTraject = Traject(_TruckID, 0, 0, 0);
-
-    //     return id;
-    // }
 
     function get_numUPC() public view returns(uint nb){
         return D.numUPC;
@@ -80,55 +91,88 @@ contract Command_preparator{
         return 1;
     }
 
-     function Associate_Traject(string memory _upc, uint _unique, uint _trajectID) public returns(uint) {
+        function new_command() public returns(uint commandID){
+        
+        Command memory newCommand;
+        newCommand.size = 0;
+        newCommand.totWeight = 0;
+        newCommand.totVolume = 0;
+        newCommand.done = false;
 
-         require(_trajectID < D.numTrajects, 'this traject does not exist');
+        D.commands.push(newCommand);
+        D.numCommands++;
+
+        return (D.numCommands - 1);  // return the index (commandID) of this new command
+    }
+
+     function Associate_Command(string memory _upc, uint _unique, uint _commandID) public returns(uint) {
+
+         require(_commandID < D.numCommands, 'this command does not exist');
          require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
          
-         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the next traject
-         // if first traject that we add to the product
+         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the command in the array
+         // if first command that we add to the product
          if (size == 0){
-             D.upcs[D.UpcToIndex[_upc].ID].numberProduct++;       //new count added
+             D.upcs[D.UpcToIndex[_upc].ID].numberProduct++;       //new instantiation of the product 
          }
          else{
-             require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].trajectID[size - 1] != _trajectID, 'traject already assigned to product');
+             uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[size - 1];
+             require(D.commands[index].done == true, 'a command not completed is already assigned to this product');
+             // require that the product is really list and needed in the command
          }
 
-         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].trajectID.push(_trajectID); // add the traject to the list
+         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs.push(_commandID); // add the traject to the list
          D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size++;
 
-         D.trajects[_trajectID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to traject
-         D.trajects[_trajectID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
+         D.commands[_commandID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to traject
+         D.commands[_commandID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
 
          return 1;
      }
 
 
-    function get_product_traject_size(string memory _upc, uint _unique) public view returns(uint){
+    function get_product_commands_size(string memory _upc, uint _unique) public view returns(uint){
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
-        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No traject registered yet');
+        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No command registered yet');
 
         return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;
     }
 
 
-    function get_product_traject(string memory _upc, uint _unique, uint _index) public view returns(uint){
+    function get_product_commandID(string memory _upc, uint _unique, uint _index) public view returns(uint){
 
-        require(_index < D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size, 'index out of bound');
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
-        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No traject registered yet');
+        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No command registered yet');
+        require(_index < D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size, 'index out of bound');
         
-        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].trajectID[_index];  // return the trajectID of the index
+        
+        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[_index];  // return the trajectID of the index
+    }
+
+    function get_command_info(uint _commandID) public view returns(uint, uint, bool){
+        require(_commandID < D.numCommands, 'this command does not exist');
+
+        return (D.commands[_commandID].totWeight, D.commands[_commandID].totVolume, D.commands[_commandID].done);
+    }
+
+    function command_completed(uint _commandID) public returns(bool){
+        // make the command.done true
+        require(_commandID < D.numCommands, 'this command does not exist');
+        require(D.commands[_commandID].done == false, 'this command is already done');
+
+        D.commands[_commandID].done = true;
+        return true;
+
     }
 
     function new_traject_ID() public returns(uint trajectID){
         
         Traject memory newTraject;
         //newTraject.truckID = _TruckID;
-        newTraject.trajectID = D.numTrajects;   // ID equal = the number of traject initialise by the contract
         newTraject.totWeight = 0;
         newTraject.totVolume = 0;
         newTraject.done = false;
+        newTraject.co2Emission = 0;
 
         D.trajects.push(newTraject);
         D.numTrajects++;
