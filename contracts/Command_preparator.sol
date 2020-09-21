@@ -228,23 +228,8 @@ contract Command_preparator{
 
          require(_commandID < D.numCommands, 'this command does not exist');
          require(_trajectID < D.numTrajects, 'this traject does not exist');
-         D.command[_commandID].
-         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the command in the array
-         // if first command that we add to the product
-         if (size == 0){
-             D.upcs[D.UpcToIndex[_upc].ID].numberProduct++;       //new instantiation of the product 
-         }
-         else{
-             uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[size - 1];    // last command
-             require(D.commands[index].done == true, 'a command not completed is already assigned to this product');
-             // require that the product is really list and needed in the command
-         }
+         //D.command[_commandID].
 
-         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs.push(_commandID); // add the traject to the list
-         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size++;
-
-         D.commands[_commandID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to traject
-         D.commands[_commandID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
 
          return 1;
      }
