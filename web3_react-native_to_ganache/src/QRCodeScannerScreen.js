@@ -68,7 +68,13 @@ const abi = [
 	},
 	{
 		"constant": false,
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "ipfsHash",
+				"type": "string"
+			}
+		],
 		"name": "command_completed",
 		"outputs": [
 			{
@@ -106,6 +112,11 @@ const abi = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"payable": false,
@@ -365,7 +376,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x8B06F91B0000724C02e229042D0EAA8304975D6A';
+const contract_address = '0x9e05BfB5555e10a09F4a0AdBef331B926454a097';
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
@@ -409,7 +420,12 @@ onRead = async e => {
     else if(this.state.function == "Associate_command"){
       console.log("SUCCESS: function: "+ this.state.function);
       var added = await this.associate_command(QrCodeJson.UPC, QrCodeJson.Unique, this.state.commandID);
-    }
+	}
+	// 4: get product order list
+	else if(this.state.function == "get_product_info"){
+		console.log("SUCCESS: function: "+ this.state.function);
+		var added = await this.Get_product_command(QrCodeJson.UPC, QrCodeJson.Unique);
+	}
     else{
       console.log("ERROR: function: "+ this.state.function + ", no corresponding QR code function!");
     }
@@ -516,7 +532,7 @@ async get_command_info(commandID){
     console.log(result['0']);
     console.log(result['1']);
     console.log(result['2']);
-    Alert.alert('Command info', 'Command ID: ' + commandID + '\nTotal weight: ' + result['0'] + '\nTotal volume: ' + result['1'] + '\nDone: ' + result['2']);
+    Alert.alert('Command info', 'Command ID: ' + commandID + '\nTotal weight: ' + result['0'] + '\nTotal volume: ' + result['1'] + '\nDone: ' + result['2'] +'\nIPFS hash: ' + result['3']);
   }
   catch(e){
     Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + commandID);
