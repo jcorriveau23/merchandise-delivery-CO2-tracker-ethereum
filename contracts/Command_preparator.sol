@@ -47,15 +47,16 @@ contract Command_preparator{
     }
 
     struct Traject {
-        uint[] TrailerIDs;  // dynamic list of trailerID 
-        uint truckID;       // truck that drive the command
+        uint[] TrailerIDs;  // dynamic list of trailerID (some truc can carry more than one trailer)
+        uint truckID;       // truck that drive the traject
         uint totWeight;     // total weight of the traject = sums of commands total weight
         uint totVolume;     // total volume of the traject = sums of commands total volume
         // uint fromID;
         // uint toID;
-
+        bool loaded;         // true when the traject is fully charged
         bool done;          // true when the traject is done => co2Emission is valid
         uint co2Emission;   // only valid when => done = true
+        string ipfsTrajectHash;
     }
 
     Data D;
@@ -113,11 +114,11 @@ contract Command_preparator{
     // return: ID of the command (index in the commands array)
     function new_command() public returns(uint commandID){
         
-        if(D.numCommands > 0){
-            uint _commandID = D.openCommandID[msg.sender];
-            require(D.commands[_commandID].done == true, "already have an open command");    
+        uint _commandID = D.openCommandID[msg.sender];
+        if(_commandID < D.numCommands){   
+            require(D.commands[_commandID].done == true, "already have an open command");  
         }
-
+        
         Command memory newCommand;
         newCommand.size = 0;
         newCommand.totWeight = 0;
@@ -126,6 +127,7 @@ contract Command_preparator{
 
         D.commands.push(newCommand);
         D.openCommandID[msg.sender] = D.numCommands;
+        
         D.numCommands++;
 
         return (D.numCommands - 1);  // return the index (commandID) of this new command
@@ -135,12 +137,16 @@ contract Command_preparator{
     // description: add to a unique product's commandIDs list, a new command
     // input:
     // return:
-     function Associate_Command(string memory _upc, uint _unique, uint _commandID) public returns(uint) {
-
-         require(_commandID < D.numCommands, 'this command does not exist');
-         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
+     function Associate_Command(string memory _upc, uint _unique) public returns(uint) {
+        
+        require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
+        
+        uint _commandID = D.openCommandID[msg.sender];
+        if(_commandID < D.numCommands){   
+            require(D.commands[_commandID].done == false, "command must not be completed");  
+        }
          
-         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the command in the array
+         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the command in the unique product array
          // if first command that we add to the product
          if (size == 0){
              D.upcs[D.UpcToIndex[_upc].ID].numberProduct++;       //new instantiation of the product 
@@ -148,7 +154,7 @@ contract Command_preparator{
          else{
              uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[size - 1];    // last command
              require(D.commands[index].done == true, 'a command not completed is already assigned to this product');
-             // require that the product is really list and needed in the command
+             // require that the traject is done not only the last command------------------------------------------------------------------------------------
          }
 
          D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs.push(_commandID); // add the command to the list
@@ -222,38 +228,73 @@ contract Command_preparator{
     // description: create a new traject
     // input: N/A
     // return: the trajectID of the new traject (index of the trajects list)
-    function new_traject_ID() public returns(uint trajectID){
+    function new_traject() public returns(uint trajectID){
+        uint _trajectID = D.openTrajectID[msg.sender];
+        
+        if(_trajectID < D.numTrajects){   
+            require(D.trajects[_trajectID].loaded == true, "already have an open traject");  
+        }
         
         Traject memory newTraject;
-        //newTraject.truckID = _TruckID;
+        newTraject.truckID = 0;
         newTraject.totWeight = 0;
         newTraject.totVolume = 0;
+        newTraject.loaded = false;
         newTraject.done = false;
         newTraject.co2Emission = 0;
 
         D.trajects.push(newTraject);
+        D.openTrajectID[msg.sender] = D.numTrajects;
         D.numTrajects++;
 
         return (D.numTrajects - 1);
     }
+    function loading_completed(string memory _IpfsTrajectHash) public returns(bool){
+        uint _trajectID = D.openTrajectID[msg.sender];
+        require(D.trajects[_trajectID].loaded == false, "traject is already loaded");
+        D.trajects[_trajectID].loaded = true;
+        D.trajects[_trajectID].ipfsTrajectHash = _IpfsTrajectHash;
+    }
+    
+    function get_current_trajectID() public view returns(uint){
+        return D.openTrajectID[msg.sender];
+    }
+    
     // Associate_traject
     // description: add a command to a traject
-    // input:
-    // return:
-    //  function Associate_Traject(uint _commandID, uint _trajectID) public returns(uint) {
-
-    //      require(_commandID < D.numCommands, 'this command does not exist');
-    //      require(_trajectID < D.numTrajects, 'this traject does not exist');
-    //      //D.command[_commandID].
-
-
-    //      return 1;
-    //  }
-    function get_traject_info(uint _trajectID) public view returns(uint, uint, bool){
+    // input: ID of a command and ID of the traject
+    // return: 
+     function Associate_Traject(uint _commandID) public returns(bool) {
+        
+        require(_commandID < D.numCommands, "this command does not exist");
+        require(D.commands[_commandID].done == true, "this command is not completed");
+        uint size = D.commands[_commandID].size; // index where to add the new trajectID
+        if(size > 0){
+            // if command was already assigned to a traject
+            uint last_trajectID = D.commands[_commandID].TrajectIDs[size-1];
+            require(D.trajects[last_trajectID].done == true, "a traject not completed is already assigned to that command");
+        }
+        
+        uint _trajectID = D.openTrajectID[msg.sender];
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].loaded == false, "this traject must not be already loaded");
+        
+        
+        
+        D.commands[_commandID].TrajectIDs.push(_trajectID);
+        D.commands[_commandID].size++;
+        
+        D.trajects[_trajectID].totWeight += D.commands[_commandID].totWeight;
+        D.trajects[_trajectID].totVolume += D.commands[_commandID].totVolume;
+        
+        return true;
+     }
+    function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, uint, bool, bool, string memory){
         require(_trajectID < D.numTrajects, 'this traject does not exist');
 
-        return (D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].done);
+        return (D.trajects[_trajectID].truckID, D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
     }
+    
 
     function traject_start(uint trajectID, uint CO2Counter, uint time) public returns(bool){
 
