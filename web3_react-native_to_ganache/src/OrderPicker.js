@@ -16,11 +16,6 @@ const abi = [
 				"internalType": "uint256",
 				"name": "_unique",
 				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
 			}
 		],
 		"name": "Associate_Command",
@@ -29,6 +24,27 @@ const abi = [
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "Associate_Traject",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"payable": false,
@@ -141,6 +157,21 @@ const abi = [
 	{
 		"constant": true,
 		"inputs": [],
+		"name": "get_current_trajectID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
 		"name": "get_numUPC",
 		"outputs": [
 			{
@@ -232,9 +263,29 @@ const abi = [
 				"type": "uint256"
 			},
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
 			}
 		],
 		"payable": false,
@@ -285,6 +336,27 @@ const abi = [
 	},
 	{
 		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_IpfsTrajectHash",
+				"type": "string"
+			}
+		],
+		"name": "loading_completed",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
 		"inputs": [],
 		"name": "new_command",
 		"outputs": [
@@ -301,7 +373,7 @@ const abi = [
 	{
 		"constant": false,
 		"inputs": [],
-		"name": "new_traject_ID",
+		"name": "new_traject",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -376,7 +448,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x9e05BfB5555e10a09F4a0AdBef331B926454a097';
+const contract_address = '0x6Fc86F3aeBc3E01b61d29D17CE2F1211cd33BbD4';
 
 const Web3 = require('web3');
 const IPFS  = require('ipfs-mini');

@@ -12,11 +12,11 @@ export default class Home extends Component {
         />
         <Button
           title={"Loading attendent App"}
-          onPress={() => this.props.navigation.navigate("OrderPicker")}
+          onPress={() => this.props.navigation.navigate("LoadingAttendant")}
         />
         <Button
           title={"Trucker App"}
-          onPress={() => this.props.navigation.navigate("OrderPicker")}
+          onPress={() => this.props.navigation.navigate("Trucker")}
         />
         <Button
           title={"v1 App"}
