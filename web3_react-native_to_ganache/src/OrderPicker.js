@@ -482,13 +482,8 @@ export default class OrderPicker extends Component {
 
   async going_back(){
 	const qrCode = await this.props.navigation.getParam("data", "No data read");
-	console.log("return: " + qrCode.UPC);
-	
 	const functions = await this.props.navigation.getParam("function", "No data read");
-	console.log("return: " + functions);
-
 	const added = await this.props.navigation.getParam("added", "No data read");
-	console.log("return: " + added);
 
 	this.setState({QrcodeScan: qrCode.UPC});
 	this.setState({function: functions});
@@ -507,14 +502,18 @@ export default class OrderPicker extends Component {
 
 			if(order == null){
 				// no order stored first product
+
 				currentOrder.push(qrCode);
-				currentOrderString = JSON.stringify(currentOrder);
+				var jsonOrder = {
+					"orderID": this.state.commandID,
+					"productList": currentOrder
+				};
+				currentOrderString = JSON.stringify(jsonOrder);
 			}
 			else{
-				console.log(order)
-				currentOrder = JSON.parse(order);
-				currentOrder.push(qrCode);
-				currentOrderString = JSON.stringify(currentOrder);
+				var currentOrderJSON = JSON.parse(order);
+				currentOrderJSON['productList'].push(qrCode);
+				currentOrderString = JSON.stringify(currentOrderJSON);
 			}
 
 			await AsyncStorage.setItem('order', currentOrderString);
@@ -570,8 +569,11 @@ export default class OrderPicker extends Component {
   async close_command() {
 		
 	try{
-		var order = await AsyncStorage.getItem('order'); 
-		var hash = await ipfs.add(order);
+		var order = await AsyncStorage.getItem('order');
+		var jsonOrder = JSON.parse(order); 
+		jsonOrder['totWeight'] = this.state.orderInfo['0'];
+		jsonOrder['totVolume'] = this.state.orderInfo['1'];
+		var hash = await ipfs.add(JSON.stringify(jsonOrder));
 		
 
 		var IpfsURL = 'https://ipfs.infura.io/ipfs/'+hash;

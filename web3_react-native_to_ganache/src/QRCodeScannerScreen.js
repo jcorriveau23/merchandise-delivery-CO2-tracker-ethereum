@@ -509,9 +509,10 @@ onRead = async e => {
     else{
       console.log("ERROR: function: "+ this.state.function + ", no corresponding QR code function!");
 	}
+
 	if(this.state.function == "associate_traject"){
 		await this.props.navigation.navigate("LoadingAttendant", {
-			data: QrCodeJson,
+			data: this.state.commandID,
 			function: this.state.function,
 			added: added
 		})
@@ -583,9 +584,10 @@ async associate_command(UPC, UniquenessID) {
 async associate_traject(UPC, UniquenessID){
 	try {
 		var lenght = await contract.methods.get_product_commands_size(UPC, UniquenessID).call();
-		var commandID = await contract.methods.get_product_commandID(UPC, UniquenessID, lenght-1).call();
+		var commandID = await contract.methods.get_product_commandID(UPC, UniquenessID, lenght-1).call(); // get the last commandID associated to that traject
+		this.setState({commandID: commandID});
 	}catch(error){
-		Alert.alert('this product was not assign to a command yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);
+		Alert.alert('this product was not assign to a command yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);	
 	}
 
 	const data = contract.methods.Associate_Traject(commandID).encodeABI();
@@ -609,6 +611,7 @@ async associate_traject(UPC, UniquenessID){
 		console.log(error);
 		Alert.alert('something went wrong', 'command ID: ' + commandID + '\nTraject ID: ' + this.state.trajectID);
 	}
+	return false;
 }
 
 async Get_product_Volume(UPC) {

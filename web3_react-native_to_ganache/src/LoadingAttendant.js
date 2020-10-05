@@ -468,6 +468,7 @@ export default class LoadingAttendant extends Component {
     constructor(props){
         super(props);
         this.state = {
+			commandID: 0,
             trajectInfo: "",
             IpfsURL: "",
     
@@ -476,14 +477,61 @@ export default class LoadingAttendant extends Component {
             totalVolume: 0,
             done: false
         };
-    }
+	}
+	async going_back(){
+		var commandID = await this.props.navigation.getParam("data", "No data read");
+		var functions = await this.props.navigation.getParam("function", "No data read");
+		var added = await this.props.navigation.getParam("added", "No data read");
+
+		console.log(commandID);
+		this.setState({commandID: commandID});
+		this.setState({function: functions});
+		if (functions == "associate_traject"){
+		
+			var currentTraject = [];
+			var currentTrajectString = "";
+	
+			if(added == true){	
+				// async storage the current traject info	
+				var traject = await AsyncStorage.getItem('traject');
+
+				var orderInfo = await contract.methods.get_command_info(commandID).call();
+				console.log(orderInfo)
+				var newCommand = {
+					"commandID": commandID,
+					"totWeight": orderInfo['0'],
+					"totVolume": orderInfo['1']
+				}
+
+				await this.get_traject_info(this.state.trajectID, false);
+	
+				if(traject == null){
+					// no traject stored first command added
+
+					currentTraject.push(newCommand);
+					var jsonTraject = {
+						"trajectID": this.state.trajectID,
+						"commandList": currentTraject
+					};
+					currentTrajectString = JSON.stringify(jsonTraject);
+				}
+				else{
+					var currentTrajectJSON = JSON.parse(traject);
+					currentTrajectJSON['commandList'].push(qrCode);
+					currentTrajectString = JSON.stringify(currentTrajectJSON);
+				}
+	
+				await AsyncStorage.setItem('traject', currentTrajectString);
+				console.log("Product added => async storage: " + currentTrajectString)
+				}	
+			}
+	}
+
     async componentDidMount(){
         var trajectID = await contract.methods.get_current_trajectID().call();
         await this.get_traject_info(trajectID, false);
         //this.setState({orderInfo: orderInfo});
         this.setState({trajectID: trajectID});
-        
-    
       }
     async init_traject() {
 
@@ -581,7 +629,7 @@ export default class LoadingAttendant extends Component {
         <Button
           title={"Associate trailer to traject"}
           onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-              data: "associate_traject"
+              data: "associate_trailer"
           })}
         />
         <Button
