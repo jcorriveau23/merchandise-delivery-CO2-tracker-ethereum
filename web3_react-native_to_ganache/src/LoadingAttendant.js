@@ -564,8 +564,29 @@ export default class LoadingAttendant extends Component {
     }
     async loading_completed(){
 
-        // IPFS
-        var hash = "traject content hash"
+		try{
+			var traject = await AsyncStorage.getItem('traject');
+			var jsonTraject = JSON.parse(traject); 
+			jsonTraject['totWeight'] = this.state.trajectInfo['1'];
+			jsonTraject['totVolume'] = this.state.trajectInfo['2'];
+			var hash = await ipfs.add(JSON.stringify(jsonTraject));
+			
+	
+			var IpfsURL = 'https://ipfs.infura.io/ipfs/'+hash;
+	
+			console.log(IpfsURL);
+		}
+		catch(error){
+			console.log(error);
+			if(error.toString().includes("null is not an object")){
+				Alert.alert('Error: nothing in traject', 'wont store order in IPFS\ntrajectID: ' + this.state.trajectID);
+				var hash = 0; //
+			}
+			else{
+				Alert.alert('Error: IPFS Storing did not work', 'trajectID: ' + this.state.trajectID);
+				return -1;
+			}
+		}
 
         const data = contract.methods.loading_completed(hash).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
@@ -581,16 +602,17 @@ export default class LoadingAttendant extends Component {
         );
         try{
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    
             await this.get_traject_info(this.state.trajectID, false);
     
-            Alert.alert('traject loaded', 'traject ID: ' + this.state.trajectID);  
+			Alert.alert('traject loaded', 'traject ID: ' + this.state.trajectID);  
+			this.setState({IpfsURL: IpfsURL});
         }catch(error){
             if (error.toString().includes("traject is already loaded")) {
                 Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
             } 
         }
-    }
+	}
+	
     async get_traject_info(trajectID, alert){
         console.log('get_command_info');
         try {
@@ -624,7 +646,7 @@ export default class LoadingAttendant extends Component {
         <Text>traject done: {String(this.state.trajectInfo['5'])}</Text>
 		<Text style={{color: 'blue'}} 
 			onPress={() => Linking.openURL(this.state.IpfsURL)}
-			>IPFS traject hash: {String(this.state.trajectInfo['3'])}
+			>IPFS hash: {String(this.state.trajectInfo['6'])}
 		</Text>
         <Button
           title={"Associate trailer to traject"}
