@@ -14,7 +14,8 @@ contract Command_preparator{
         uint numTrajects;
 
         mapping(address => uint) openCommandID;  // link the orderpicker to is current order ID
-        mapping(address => uint) openTrajectID;  // link the trucker to is current traject ID
+        mapping(address => uint) LoadingAttendantOpenTrajectID;  // link the trucker to is current traject ID
+        mapping(address => uint) TruckerOpenTrajectID;  // link the trucker to is current traject ID
     }
 
     struct UPC {                                // store the weight and volume of a specific product (UPC)
@@ -48,12 +49,14 @@ contract Command_preparator{
 
     struct Traject {
         uint[] TrailerIDs;  // dynamic list of trailerID (some truc can carry more than one trailer)
+        uint8 nbTrailers;    //
         uint truckID;       // truck that drive the traject
         uint totWeight;     // total weight of the traject = sums of commands total weight
         uint totVolume;     // total volume of the traject = sums of commands total volume
         // uint fromID;
         // uint toID;
         bool loaded;         // true when the traject is fully charged
+        bool started;          // true when the traject is done => co2Emission is valid
         bool done;          // true when the traject is done => co2Emission is valid
         uint co2Emission;   // only valid when => done = true
         string ipfsTrajectHash;
@@ -229,13 +232,14 @@ contract Command_preparator{
     // input: N/A
     // return: the trajectID of the new traject (index of the trajects list)
     function new_traject() public returns(uint trajectID){
-        uint _trajectID = D.openTrajectID[msg.sender];
+        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
         
         if(_trajectID < D.numTrajects){   
             require(D.trajects[_trajectID].loaded == true, "already have an open traject");  
         }
         
         Traject memory newTraject;
+        newTraject.nbTrailers = 0;
         newTraject.truckID = 0;
         newTraject.totWeight = 0;
         newTraject.totVolume = 0;
@@ -244,20 +248,20 @@ contract Command_preparator{
         newTraject.co2Emission = 0;
 
         D.trajects.push(newTraject);
-        D.openTrajectID[msg.sender] = D.numTrajects;
+        D.LoadingAttendantOpenTrajectID[msg.sender] = D.numTrajects;
         D.numTrajects++;
 
         return (D.numTrajects - 1);
     }
     function loading_completed(string memory _IpfsTrajectHash) public returns(bool){
-        uint _trajectID = D.openTrajectID[msg.sender];
+        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
         require(D.trajects[_trajectID].loaded == false, "traject is already loaded");
         D.trajects[_trajectID].loaded = true;
         D.trajects[_trajectID].ipfsTrajectHash = _IpfsTrajectHash;
     }
     
     function get_current_trajectID() public view returns(uint){
-        return D.openTrajectID[msg.sender];
+        return D.LoadingAttendantOpenTrajectID[msg.sender];
     }
     
     // Associate_traject
@@ -275,7 +279,7 @@ contract Command_preparator{
             require(D.trajects[last_trajectID].done == true, "a traject not completed is already assigned to that command");
         }
         
-        uint _trajectID = D.openTrajectID[msg.sender];
+        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
         require(_trajectID < D.numTrajects, 'this traject does not exist');
         require(D.trajects[_trajectID].loaded == false, "this traject must not be already loaded");
         
@@ -289,18 +293,56 @@ contract Command_preparator{
         
         return true;
      }
+     
+    // associate_trailer
+    // description: add a trailers ID to the trajects (a truck transport multiple trailers)
+    // input: ID of a command and ID of the traject
+    // return:      
+    function associate_trailer(uint _trailerID) public returns(bool) {
+        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].loaded == false, "this traject must not be already loaded");
+        
+        D.trajects[_trajectID].TrailerIDs.push(_trailerID);
+        D.trajects[_trajectID].nbTrailers++;
+    }
+    
     function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, uint, bool, bool, string memory){
         require(_trajectID < D.numTrajects, 'this traject does not exist');
 
         return (D.trajects[_trajectID].truckID, D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
     }
     
+    function grab_traject(uint _trajectID) public returns(bool){
+        
+        
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
+        require(D.trajects[_trajectID].started == false, "this traject must not be completed");
+        require(D.trajects[D.TruckerOpenTrajectID[msg.sender]].done == true, "trucker must have completed is last traject");
+        
+        D.TruckerOpenTrajectID[msg.sender] = _trajectID;
+    }    
 
-    function traject_start(uint trajectID, uint CO2Counter, uint time) public returns(bool){
-
+    function traject_start(uint _CO2Counter) public returns(bool){
+        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
+        require(D.trajects[_trajectID].started == false, "this traject must not be started");
+        
+        D.trajects[_trajectID].started == true;
+        D.trajects[_trajectID].co2Emission = _CO2Counter;
+        
     }
 
-    function trajetc_stop(uint trajectID, uint CO2Counter, uint time) public returns(bool){
-
+    function trajetc_stop(uint _CO2Counter) public returns(bool){
+        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
+        require(D.trajects[_trajectID].started == true, "this traject must be started");
+        require(D.trajects[_trajectID].done == false, "this traject must be started");
+        
+        D.trajects[_trajectID].started == true;
+        D.trajects[_trajectID].co2Emission = _CO2Counter - D.trajects[_trajectID].co2Emission;
     }
 }
