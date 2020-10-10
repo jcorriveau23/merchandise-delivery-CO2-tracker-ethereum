@@ -86,6 +86,27 @@ const abi = [
 		"constant": false,
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "associate_trailer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "ipfsHash",
 				"type": "string"
@@ -246,6 +267,27 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_trailer_current_traject",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_trajectID",
 				"type": "uint256"
 			}
@@ -268,9 +310,9 @@ const abi = [
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			},
 			{
 				"internalType": "bool",
@@ -286,6 +328,21 @@ const abi = [
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_trucker_current_trajectID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -332,6 +389,27 @@ const abi = [
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
+		"name": "grab_traject",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -390,17 +468,12 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
@@ -421,21 +494,16 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
-		"name": "trajetc_stop",
+		"name": "traject_stop",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -448,7 +516,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x6Fc86F3aeBc3E01b61d29D17CE2F1211cd33BbD4';
+const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
@@ -481,39 +549,58 @@ componentDidMount(){
 }
 onRead = async e => {
     const QrCodeJson = JSON.parse(e.data);  
-    // 1: Register product
+    // 1: Register product (order Picker)
     if(this.state.function == "Register"){
       console.log("SUCCESS: function: "+ this.state.function);
       await this.new_product(QrCodeJson.UPC, QrCodeJson.Weight, QrCodeJson.Volume);
     }
-    // 2: Get product info
+    // 2: Get product info (order Picker)
     else if(this.state.function == "get info"){
       console.log("SUCCESS: function: "+ this.state.function);
       await this.Get_product_Volume(QrCodeJson.UPC);
     }
-    // 3: Associate Order
+    // 3: Associate Order (order Picker)
     else if(this.state.function == "Associate_command"){
       console.log("SUCCESS: function: "+ this.state.function);
       var added = await this.associate_command(QrCodeJson.UPC, QrCodeJson.Unique, this.state.commandID);
 	}
-	// 4: get product order list
+	// 4: get product order list (order Picker)
 	else if(this.state.function == "get_product_info"){
 		console.log("SUCCESS: function: "+ this.state.function);
 		var added = await this.Get_product_command(QrCodeJson.UPC, QrCodeJson.Unique);
 	}
-	// 5: get product order list
+	// 5: associate traject (loading attendant)
 	else if(this.state.function == "associate_traject"){
 		console.log("SUCCESS: function: "+ this.state.function);
 		var added = await this.associate_traject(QrCodeJson.UPC, QrCodeJson.Unique);
+	}
+	// 6: associate trailer (loading attendant)
+	else if(this.state.function == "associate_trailer"){
+		console.log("SUCCESS: function: "+ this.state.function);
+		var added = await this.associate_trailer(QrCodeJson.trailerID);
+	}
+	// 7: associate trailer (Trucker)
+	else if(this.state.function == "grab_traject"){
+		console.log("SUCCESS: function: "+ this.state.function);
+		var added = await this.grab_traject(QrCodeJson.trailerID);
 	}
     else{
       console.log("ERROR: function: "+ this.state.function + ", no corresponding QR code function!");
 	}
 
-	if(this.state.function == "associate_traject"){
+	if(this.state.function == "associate_traject" || this.state.function == "associate_trailer"){
 		await this.props.navigation.navigate("LoadingAttendant", {
 			data: this.state.commandID,
 			function: this.state.function,
+			trailerID: QrCodeJson,
+			added: added
+		})
+	}
+	else if(this.state.function == "grab_traject"){
+		await this.props.navigation.navigate("Trucker", {
+			data: this.state.commandID,
+			function: this.state.function,
+			trailerID: QrCodeJson,
 			added: added
 		})
 	}
@@ -613,7 +700,58 @@ async associate_traject(UPC, UniquenessID){
 	}
 	return false;
 }
+async associate_trailer(trailerID){
 
+	const data = contract.methods.associate_trailer(trailerID).encodeABI();
+	const nonce = await web3.eth.getTransactionCount(publicKey);
+	const signedTx = await web3.eth.accounts.signTransaction(
+		{
+			nonce: nonce,
+			gasLimit: '0x200710',
+			gasPrice: '0x0A',
+			to: contract_address,
+			data: data,
+		},
+		privateKey
+	);
+	try{
+		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		Alert.alert('trailer ID assigned to traject',"trailer ID: "+ trailerID + '\ntraject ID: ' + this.state.trajectID);
+		return true;
+		
+	}catch(error){
+		console.log(error);
+		Alert.alert('Error', 'could not added trailerID to traject\n' + "trailer ID: "+ trailerID + '\ntraject ID: ' + this.state.trajectID);
+	}
+	return false;
+}
+async grab_traject(trailerID){
+
+	var trajectID = await contract.methods.get_trailer_current_traject(trailerID).call();
+
+	const data = contract.methods.grab_traject(trajectID).encodeABI();
+	const nonce = await web3.eth.getTransactionCount(publicKey);
+	const signedTx = await web3.eth.accounts.signTransaction(
+		{
+			nonce: nonce,
+			gasLimit: '0x200710',
+			gasPrice: '0x0A',
+			to: contract_address,
+			data: data,
+		},
+		privateKey
+	);
+	try{
+		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		Alert.alert('Grabed new traject',"Traject ID: "+ trajectID + '\nTrailer ID: ' + trailerID);
+		return true;
+		
+	}catch(error){
+		console.log(error);
+		Alert.alert('Error', 'could not grabed this traject\n' + "Traject ID: "+ trajectID + '\nTrailer ID: ' + trailerID);
+	}
+	return false;
+}
 async Get_product_Volume(UPC) {
   var weight = await contract.methods.get_upc_weight(UPC).call();
   var volume = await contract.methods.get_upc_Volume(UPC).call();

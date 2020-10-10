@@ -14,8 +14,9 @@ contract Command_preparator{
         uint numTrajects;
 
         mapping(address => uint) openCommandID;  // link the orderpicker to is current order ID
-        mapping(address => uint) LoadingAttendantOpenTrajectID;  // link the trucker to is current traject ID
-        mapping(address => uint) TruckerOpenTrajectID;  // link the trucker to is current traject ID
+        mapping(address => uint) LoadingAttendantOpenTrajectID;  // link the loading attendant to his current traject ID
+        mapping(address => uint) TruckerOpenTrajectID;  // link the trucker to his current traject ID
+        mapping(uint => uint) TrailerCurrentTraject; //  Ling the trailer to his current traject ID
     }
 
     struct UPC {                                // store the weight and volume of a specific product (UPC)
@@ -305,12 +306,21 @@ contract Command_preparator{
         
         D.trajects[_trajectID].TrailerIDs.push(_trailerID);
         D.trajects[_trajectID].nbTrailers++;
+        D.TrailerCurrentTraject[_trailerID] = _trajectID;
     }
     
     function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, uint, bool, bool, string memory){
         require(_trajectID < D.numTrajects, 'this traject does not exist');
 
         return (D.trajects[_trajectID].truckID, D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
+    }
+    
+    function get_trailer_current_traject(uint _trailerID) public view returns(uint){
+        return D.TrailerCurrentTraject[_trailerID];
+    }
+    
+    function get_trucker_current_trajectID() public view returns(uint){
+        return D.Trucker9OpenTrajectID[msg.sender];
     }
     
     function grab_traject(uint _trajectID) public returns(bool){
@@ -335,7 +345,7 @@ contract Command_preparator{
         
     }
 
-    function trajetc_stop(uint _CO2Counter) public returns(bool){
+    function traject_stop(uint _CO2Counter) public returns(bool){
         uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
         require(_trajectID < D.numTrajects, 'this traject does not exist');
         require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");

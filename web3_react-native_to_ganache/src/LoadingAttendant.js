@@ -86,6 +86,27 @@ const abi = [
 		"constant": false,
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "associate_trailer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "ipfsHash",
 				"type": "string"
@@ -246,6 +267,27 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_trailer_current_traject",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_trajectID",
 				"type": "uint256"
 			}
@@ -268,9 +310,9 @@ const abi = [
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			},
 			{
 				"internalType": "bool",
@@ -286,6 +328,21 @@ const abi = [
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_trucker_current_trajectID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -332,6 +389,27 @@ const abi = [
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
+		"name": "grab_traject",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -390,17 +468,12 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
@@ -421,21 +494,16 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
-		"name": "trajetc_stop",
+		"name": "traject_stop",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -448,7 +516,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x6Fc86F3aeBc3E01b61d29D17CE2F1211cd33BbD4';
+const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
 
 const Web3 = require('web3');
 const IPFS  = require('ipfs-mini');
@@ -470,7 +538,6 @@ export default class LoadingAttendant extends Component {
         this.state = {
 			commandID: 0,
             trajectInfo: "",
-            IpfsURL: "",
     
             trajectID: 0,
             totalWeight: 0,
@@ -482,21 +549,28 @@ export default class LoadingAttendant extends Component {
 		var commandID = await this.props.navigation.getParam("data", "No data read");
 		var functions = await this.props.navigation.getParam("function", "No data read");
 		var added = await this.props.navigation.getParam("added", "No data read");
+		var trailerID = await this.props.navigation.getParam("trailerID", "No data read");
 
 		console.log(commandID);
+		console.log(trailerID);
+		console.log(functions);
+		console.log(added);
+
 		this.setState({commandID: commandID});
 		this.setState({function: functions});
-		if (functions == "associate_traject"){
-		
+
+		// info has been added to the traject
+		if(added == true){	
 			var currentTraject = [];
 			var currentTrajectString = "";
-	
-			if(added == true){	
-				// async storage the current traject info	
-				var traject = await AsyncStorage.getItem('traject');
 
+			// async storage the current traject info	
+			var traject = await AsyncStorage.getItem('traject');
+
+			
+			if(functions.includes("traject")){
 				var orderInfo = await contract.methods.get_command_info(commandID).call();
-				console.log(orderInfo)
+
 				var newCommand = {
 					"commandID": commandID,
 					"totWeight": orderInfo['0'],
@@ -507,32 +581,51 @@ export default class LoadingAttendant extends Component {
 	
 				if(traject == null){
 					// no traject stored first command added
-
 					currentTraject.push(newCommand);
 					var jsonTraject = {
 						"trajectID": this.state.trajectID,
+						"trailerIDs": [],
 						"commandList": currentTraject
 					};
 					currentTrajectString = JSON.stringify(jsonTraject);
 				}
 				else{
 					var currentTrajectJSON = JSON.parse(traject);
-					currentTrajectJSON['commandList'].push(qrCode);
+					currentTrajectJSON['commandList'].push(newCommand);
 					currentTrajectString = JSON.stringify(currentTrajectJSON);
 				}
-	
-				await AsyncStorage.setItem('traject', currentTrajectString);
-				console.log("Product added => async storage: " + currentTrajectString)
+
 				}	
+			
+			else if(functions.includes("trailer")){
+				if(traject == null){
+					// no traject stored first trailer added
+					var jsonTraject = {
+						"trajectID": this.state.trajectID,
+						"trailerIDs": [],
+						"commandList": []
+					};
+					jsonTraject["trailerIDs"].push(trailerID)
+					currentTrajectString = JSON.stringify(jsonTraject);
+				}
+				else{
+					var currentTrajectJSON = JSON.parse(traject);
+					currentTrajectJSON['trailerIDs'].push(trailerID);
+					currentTrajectString = JSON.stringify(currentTrajectJSON);
+				}
 			}
+			AsyncStorage.setItem('traject', currentTrajectString);
+			console.log(currentTrajectString);
+		}
+			
+
 	}
 
     async componentDidMount(){
         var trajectID = await contract.methods.get_current_trajectID().call();
         await this.get_traject_info(trajectID, false);
-        //this.setState({orderInfo: orderInfo});
-        this.setState({trajectID: trajectID});
-      }
+		this.setState({trajectID: trajectID});
+    }
     async init_traject() {
 
         const data = contract.methods.new_traject().encodeABI();
@@ -552,7 +645,6 @@ export default class LoadingAttendant extends Component {
     
             var newtrajectID = await contract.methods.get_current_trajectID().call();
             this.setState({trajectID: newtrajectID});
-            this.setState({IpfsURL: ""})
             await this.get_traject_info(newtrajectID, false);
     
             Alert.alert('traject created', 'traject ID: ' + this.state.trajectID);  
@@ -605,7 +697,6 @@ export default class LoadingAttendant extends Component {
             await this.get_traject_info(this.state.trajectID, false);
     
 			Alert.alert('traject loaded', 'traject ID: ' + this.state.trajectID);  
-			this.setState({IpfsURL: IpfsURL});
         }catch(error){
             if (error.toString().includes("traject is already loaded")) {
                 Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
@@ -640,18 +731,21 @@ export default class LoadingAttendant extends Component {
           onPress={() => this.loading_completed()}
         /> 
         <Text>Current traject ID : {this.state.trajectID}</Text>
-		<Text>traject total weight: {this.state.trajectInfo['1']}</Text>
-		<Text>traject total volume: {this.state.trajectInfo['2']}</Text>
-		<Text>traject loaded: {String(this.state.trajectInfo['4'])}</Text>
-        <Text>traject done: {String(this.state.trajectInfo['5'])}</Text>
+		<Text>traject total weight: {this.state.trajectInfo['0']}</Text>
+		<Text>traject total volume: {this.state.trajectInfo['1']}</Text>
+		<Text>traject CO2 emission: {this.state.trajectInfo['2']}</Text>
+        <Text>traject loaded: {String(this.state.trajectInfo['3'])}</Text>
+        <Text>traject started: {String(this.state.trajectInfo['4'])}</Text>
+		<Text>traject done: {String(this.state.trajectInfo['5'])}</Text>
 		<Text style={{color: 'blue'}} 
-			onPress={() => Linking.openURL(this.state.IpfsURL)}
+			onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/"+this.state.trajectInfo['6'])}
 			>IPFS hash: {String(this.state.trajectInfo['6'])}
 		</Text>
         <Button
           title={"Associate trailer to traject"}
           onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-              data: "associate_trailer"
+			  data: "associate_trailer",
+			  trajectID: this.state.trajectID
           })}
         />
         <Button

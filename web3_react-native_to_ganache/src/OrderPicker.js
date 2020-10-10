@@ -86,6 +86,27 @@ const abi = [
 		"constant": false,
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "associate_trailer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
 				"internalType": "string",
 				"name": "ipfsHash",
 				"type": "string"
@@ -246,6 +267,27 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_trailer_current_traject",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_trajectID",
 				"type": "uint256"
 			}
@@ -268,9 +310,9 @@ const abi = [
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint256",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			},
 			{
 				"internalType": "bool",
@@ -286,6 +328,21 @@ const abi = [
 				"internalType": "string",
 				"name": "",
 				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_trucker_current_trajectID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -332,6 +389,27 @@ const abi = [
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
+		"name": "grab_traject",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -390,17 +468,12 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
@@ -421,21 +494,16 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "trajectID",
+				"name": "_CO2Counter",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "time",
+				"name": "_truckID",
 				"type": "uint256"
 			}
 		],
-		"name": "trajetc_stop",
+		"name": "traject_stop",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -448,7 +516,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x6Fc86F3aeBc3E01b61d29D17CE2F1211cd33BbD4';
+const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
 
 const Web3 = require('web3');
 const IPFS  = require('ipfs-mini');
@@ -665,7 +733,7 @@ export default class OrderPicker extends Component {
 		<Text>order total volume: {this.state.orderInfo['1']}</Text>
 		<Text>order done: {String(this.state.orderInfo['2'])}</Text>
 		<Text style={{color: 'blue'}} 
-			onPress={() => Linking.openURL(this.state.IpfsURL)}
+			onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/"+this.state.orderInfo['3'])}
 			>IPFS hash: {String(this.state.orderInfo['3'])}
 		</Text>
         <Button
