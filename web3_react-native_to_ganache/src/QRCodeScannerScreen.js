@@ -292,6 +292,27 @@ const abi = [
 				"type": "uint256"
 			}
 		],
+		"name": "get_traject_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
 		"name": "get_traject_info",
 		"outputs": [
 			{
@@ -516,7 +537,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
+const contract_address = '0x70B621393c4498694288786Bc628fBd17c732fd2';
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
@@ -565,7 +586,7 @@ onRead = async e => {
       var added = await this.associate_command(QrCodeJson.UPC, QrCodeJson.Unique, this.state.commandID);
 	}
 	// 4: get product order list (order Picker)
-	else if(this.state.function == "get_product_info"){
+	else if(this.state.function == "get_product_command_list"){
 		console.log("SUCCESS: function: "+ this.state.function);
 		var added = await this.Get_product_command(QrCodeJson.UPC, QrCodeJson.Unique);
 	}
@@ -584,6 +605,20 @@ onRead = async e => {
 		console.log("SUCCESS: function: "+ this.state.function);
 		var added = await this.grab_traject(QrCodeJson.trailerID);
 	}
+	// 8: traject start (Trucker)
+	else if(this.state.function == "traject_start"){
+		console.log("SUCCESS: function: "+ this.state.function);
+		var added = await this.traject_start(QrCodeJson.Emission, QrCodeJson.truckID);
+	}
+	// 9: traject stop (Trucker)	
+	else if(this.state.function == "traject_stop"){
+		console.log("SUCCESS: function: "+ this.state.function);
+		var added = await this.traject_stop(QrCodeJson.Emission, QrCodeJson.truckID);
+	}
+	// 10: get_product (Trucker)	
+	else if(this.state.function == "get_product_info"){
+		console.log("SUCCESS: function: "+ this.state.function);
+	}
     else{
       console.log("ERROR: function: "+ this.state.function + ", no corresponding QR code function!");
 	}
@@ -596,12 +631,16 @@ onRead = async e => {
 			added: added
 		})
 	}
-	else if(this.state.function == "grab_traject"){
+	else if(this.state.function == "grab_traject" || this.state.function == "traject_start" || this.state.function == "traject_stop" ){
 		await this.props.navigation.navigate("Trucker", {
-			data: this.state.commandID,
 			function: this.state.function,
 			trailerID: QrCodeJson,
 			added: added
+		})
+	}
+	else if(this.state.function == "get_product_info"){
+		await this.props.navigation.navigate("ProductInfo", {
+			data: QrCodeJson
 		})
 	}
     else{
@@ -749,6 +788,63 @@ async grab_traject(trailerID){
 	}catch(error){
 		console.log(error);
 		Alert.alert('Error', 'could not grabed this traject\n' + "Traject ID: "+ trajectID + '\nTrailer ID: ' + trailerID);
+	}
+	return false;
+}
+async traject_start(co2Emission, truckID){
+	var trajectID = await contract.methods.get_trucker_current_trajectID().call();
+
+	const data = contract.methods.traject_start(co2Emission, truckID).encodeABI();
+	const nonce = await web3.eth.getTransactionCount(publicKey);
+	const signedTx = await web3.eth.accounts.signTransaction(
+		{
+			nonce: nonce,
+			gasLimit: '0x200710',
+			gasPrice: '0x0A',
+			to: contract_address,
+			data: data,
+		},
+		privateKey
+	);
+	try{
+		
+		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		Alert.alert('Traject started',"Traject ID: "+ trajectID + '\ntruck ID: ' + truckID + "\nCO2 counter at start: " + co2Emission);
+		return true;
+		
+	}catch(error){
+		console.log(error);
+		Alert.alert('Error', 'Traject could not started\n' + "Traject ID: "+ trajectID + '\ntruck ID: ' + truckID);
+	}
+	return false;
+}
+async traject_stop(co2Emission, truckID){
+
+	var trajectID = await contract.methods.get_trucker_current_trajectID().call();
+
+	const data = contract.methods.traject_stop(co2Emission, truckID).encodeABI();
+	const nonce = await web3.eth.getTransactionCount(publicKey);
+	const signedTx = await web3.eth.accounts.signTransaction(
+		{
+			nonce: nonce,
+			gasLimit: '0x200710',
+			gasPrice: '0x0A',
+			to: contract_address,
+			data: data,
+		},
+		privateKey
+	);
+	try{
+		
+		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		co2Emission = await contract.methods.get_traject_emission(trajectID).call();
+
+		Alert.alert('Traject stoped',"Traject ID: "+ trajectID + '\nTruck ID: ' + truckID + "\nTot CO2 emission: " + co2Emission);
+		return true;
+		
+	}catch(error){
+		console.log(error);
+		Alert.alert('Error', 'Traject could not be stoped\n' + "Traject ID: "+ trajectID + '\nTruck ID: ' + truckID);
 	}
 	return false;
 }

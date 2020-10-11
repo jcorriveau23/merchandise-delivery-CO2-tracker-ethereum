@@ -1,31 +1,24 @@
 import React, {Component} from 'react';
 import {View, Text, Button, StyleSheet} from 'react-native';
 
-export default class Home extends Component {
+export default class Info extends Component {
 
   render() {
     return (
       <View style={styles.container}>
         <Button
-          title={"Order Picker App"}
-          onPress={() => this.props.navigation.navigate("OrderPicker")}
+          title={"Product Info"}
+          onPress={() => this.props.navigation.navigate("ProductInfo")}
         />
         <Button
-          title={"Loading attendent App"}
+          title={"Command Info"}
           onPress={() => this.props.navigation.navigate("LoadingAttendant")}
         />
         <Button
-          title={"Trucker App"}
+          title={"Traject Info"}
           onPress={() => this.props.navigation.navigate("Trucker")}
         />
-        <Button
-          title={"Product Info"}
-          onPress={() => this.props.navigation.navigate("Info")}
-        />
-        <Button
-          title={"v1 App"}
-          onPress={() => this.props.navigation.navigate("v1")}
-        />
+
       </View>
     );
   }

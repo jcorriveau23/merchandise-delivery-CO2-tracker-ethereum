@@ -309,10 +309,10 @@ contract Command_preparator{
         D.TrailerCurrentTraject[_trailerID] = _trajectID;
     }
     
-    function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, uint, bool, bool, string memory){
+    function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, bool, bool, bool, string memory){
         require(_trajectID < D.numTrajects, 'this traject does not exist');
 
-        return (D.trajects[_trajectID].truckID, D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
+        return (D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].started, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
     }
     
     function get_trailer_current_traject(uint _trailerID) public view returns(uint){
@@ -320,7 +320,7 @@ contract Command_preparator{
     }
     
     function get_trucker_current_trajectID() public view returns(uint){
-        return D.Trucker9OpenTrajectID[msg.sender];
+        return D.TruckerOpenTrajectID[msg.sender];
     }
     
     function grab_traject(uint _trajectID) public returns(bool){
@@ -329,30 +329,56 @@ contract Command_preparator{
         require(_trajectID < D.numTrajects, 'this traject does not exist');
         require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
         require(D.trajects[_trajectID].started == false, "this traject must not be completed");
-        require(D.trajects[D.TruckerOpenTrajectID[msg.sender]].done == true, "trucker must have completed is last traject");
+        uint _lastTrajectID = D.TruckerOpenTrajectID[msg.sender];
+        if(_lastTrajectID > 0){
+            require(D.trajects[_lastTrajectID].done == true, "trucker must have completed is last traject");
+        }
+        
         
         D.TruckerOpenTrajectID[msg.sender] = _trajectID;
     }    
 
-    function traject_start(uint _CO2Counter) public returns(bool){
+    function traject_start(uint _CO2Counter, uint _truckID) public returns(bool){
         uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
         require(_trajectID < D.numTrajects, 'this traject does not exist');
         require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
         require(D.trajects[_trajectID].started == false, "this traject must not be started");
         
-        D.trajects[_trajectID].started == true;
+        D.trajects[_trajectID].started = true;
+        D.trajects[_trajectID].truckID = _truckID;
         D.trajects[_trajectID].co2Emission = _CO2Counter;
         
     }
 
-    function traject_stop(uint _CO2Counter) public returns(bool){
+    function traject_stop(uint _CO2Counter, uint _truckID) public returns(bool){
         uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
         require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
         require(D.trajects[_trajectID].started == true, "this traject must be started");
         require(D.trajects[_trajectID].done == false, "this traject must be started");
+        require(D.trajects[_trajectID].truckID == _truckID, "must be the same truck as traject started");
         
-        D.trajects[_trajectID].started == true;
+        D.trajects[_trajectID].done = true;
         D.trajects[_trajectID].co2Emission = _CO2Counter - D.trajects[_trajectID].co2Emission;
+    }
+    
+    function get_traject_emission(uint _trajectID) public view returns (uint){
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.trajects[_trajectID].done == true, "this is not completed");
+        
+        return D.trajects[_trajectID].co2Emission;
+    }
+    
+    function get_product_emission(string memory _upc, uint _trajectID) public view returns (uint){
+        require(_trajectID < D.numTrajects, 'this traject does not exist');
+        require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
+        require(D.trajects[_trajectID].done == true, "this is not completed");
+        
+        uint merchandiseWeight = D.trajects[_trajectID].totWeight;
+        uint merchandiseVolume = D.trajects[_trajectID].totVolume;
+        uint productWeight = D.upcs[D.UpcToIndex[_upc].ID].Weight;
+        uint productVolume = D.upcs[D.UpcToIndex[_upc].ID].Volume;
+        
+        
+        return (D.trajects[_trajectID].co2Emission*(productWeight/merchandiseWeight + productVolume/merchandiseVolume))/2;
     }
 }

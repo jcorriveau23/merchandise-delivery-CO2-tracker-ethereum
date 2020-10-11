@@ -292,6 +292,27 @@ const abi = [
 				"type": "uint256"
 			}
 		],
+		"name": "get_traject_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
 		"name": "get_traject_info",
 		"outputs": [
 			{
@@ -516,7 +537,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
+const contract_address = '0x70B621393c4498694288786Bc628fBd17c732fd2';
 
 const Web3 = require('web3');
 const IPFS  = require('ipfs-mini');
@@ -625,7 +646,8 @@ export default class LoadingAttendant extends Component {
         var trajectID = await contract.methods.get_current_trajectID().call();
         await this.get_traject_info(trajectID, false);
 		this.setState({trajectID: trajectID});
-    }
+	}
+	
     async init_traject() {
 
         const data = contract.methods.new_traject().encodeABI();
@@ -653,7 +675,8 @@ export default class LoadingAttendant extends Component {
                 Alert.alert('Error: user already have an open traject', 'open traject ID: ' + this.state.trajectID);
             } 
         }
-    }
+	}
+	
     async loading_completed(){
 
 		try{

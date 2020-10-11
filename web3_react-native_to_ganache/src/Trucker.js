@@ -292,6 +292,27 @@ const abi = [
 				"type": "uint256"
 			}
 		],
+		"name": "get_traject_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
 		"name": "get_traject_info",
 		"outputs": [
 			{
@@ -516,7 +537,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x312f7E9ae6b1D446F29b3609eB27BE6F0a11e92c';
+const contract_address = '0x70B621393c4498694288786Bc628fBd17c732fd2';
 
 const Web3 = require('web3');
 const IPFS  = require('ipfs-mini');
@@ -552,76 +573,22 @@ export default class Trucker extends Component {
   }
 
   async going_back(){
-		var commandID = await this.props.navigation.getParam("data", "No data read");
 		var functions = await this.props.navigation.getParam("function", "No data read");
 		var added = await this.props.navigation.getParam("added", "No data read");
 		var trailerID = await this.props.navigation.getParam("trailerID", "No data read");
 
-		console.log(commandID);
+		var trajectID = await contract.methods.get_trucker_current_trajectID().call();
+    	await this.get_traject_info(trajectID, false);
+
 		console.log(trailerID);
 		console.log(functions);
 		console.log(added);
 
-		this.setState({commandID: commandID});
 		this.setState({function: functions});
 
 		// info has been added to the traject
 		if(added == true){	
-			var currentTraject = [];
-			var currentTrajectString = "";
-
-			// async storage the current traject info	
-			var traject = await AsyncStorage.getItem('traject');
-
 			
-			if(functions.includes("traject")){
-				var orderInfo = await contract.methods.get_command_info(commandID).call();
-
-				var newCommand = {
-					"commandID": commandID,
-					"totWeight": orderInfo['0'],
-					"totVolume": orderInfo['1']
-				}
-
-				await this.get_traject_info(this.state.trajectID, false);
-	
-				if(traject == null){
-					// no traject stored first command added
-					currentTraject.push(newCommand);
-					var jsonTraject = {
-						"trajectID": this.state.trajectID,
-						"trailerIDs": [],
-						"commandList": currentTraject
-					};
-					currentTrajectString = JSON.stringify(jsonTraject);
-				}
-				else{
-					var currentTrajectJSON = JSON.parse(traject);
-					currentTrajectJSON['commandList'].push(newCommand);
-					currentTrajectString = JSON.stringify(currentTrajectJSON);
-				}
-
-				}	
-			
-			else if(functions.includes("trailer")){
-				if(traject == null){
-					// no traject stored first trailer added
-					var jsonTraject = {
-						"trajectID": this.state.trajectID,
-						"trailerIDs": [],
-						"commandList": []
-					};
-					jsonTraject["trailerIDs"].push(trailerID)
-					currentTrajectString = JSON.stringify(jsonTraject);
-				}
-				else{
-					var currentTrajectJSON = JSON.parse(traject);
-					currentTrajectJSON['trailerIDs'].push(trailerID);
-					currentTrajectString = JSON.stringify(currentTrajectJSON);
-				}
-			}
-			AsyncStorage.setItem('traject', currentTrajectString);
-			console.log(currentTrajectString);
 		}
 			
 
@@ -644,6 +611,7 @@ export default class Trucker extends Component {
   render() {
     return (
       <View style={styles.container}>
+		<NavigationEvents onDidFocus={() => this.going_back()} />
         <Button
           title={"grab traject"}
           onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
@@ -653,7 +621,7 @@ export default class Trucker extends Component {
         <Button
           title={"start traject"}
           onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-              data: "start_traject"
+              data: "traject_start"
           })}
         />
         <Text>Current traject ID : {this.state.trajectID}</Text>
@@ -670,7 +638,7 @@ export default class Trucker extends Component {
         <Button
           title={"end traject"}
           onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-              data: "end_traject"
+              data: "traject_stop"
           })}
         />
         <Button
