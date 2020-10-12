@@ -204,6 +204,28 @@ contract Command_preparator{
 
         return (D.commands[_commandID].totWeight, D.commands[_commandID].totVolume, D.commands[_commandID].done, D.commands[_commandID].ipfsCommandHash);
     }
+    
+    // get_command_traject_list_size
+    // description: return the number of traject this command has take part of
+    // input: _commandID
+    // return: total weight of the command, total volume of the command and if the command is done or not
+    function get_command_traject_list_size(uint _commandID) public view returns(uint8){
+        require(_commandID < D.numCommands, 'this command does not exist');
+
+        return D.commands[_commandID].size;
+    }
+    
+    // get_command_traject_list_index
+    // description: one trajectID of the command's trajectIDs list
+    // input: _commandID, _index
+    // return: total weight of the command, total volume of the command and if the command is done or not
+    function get_command_traject_list_index(uint _commandID, uint8 _index) public view returns(uint){
+        require(_commandID < D.numCommands, 'this command does not exist');
+        require(D.commands[_commandID].size > _index);
+
+        return D.commands[_commandID].TrajectIDs[_index];
+    }
+    
     // get_command_info
     // description: return the info of a command
     // input: _commandID
@@ -379,6 +401,6 @@ contract Command_preparator{
         uint productVolume = D.upcs[D.UpcToIndex[_upc].ID].Volume;
         
         
-        return (D.trajects[_trajectID].co2Emission*(productWeight/merchandiseWeight + productVolume/merchandiseVolume))/2;
+        return (D.trajects[_trajectID].co2Emission*(productWeight*merchandiseVolume + productVolume*merchandiseWeight) / (2*merchandiseWeight*merchandiseVolume));
     }
 }
