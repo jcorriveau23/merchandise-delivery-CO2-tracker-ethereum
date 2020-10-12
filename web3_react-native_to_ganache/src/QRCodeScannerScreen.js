@@ -162,6 +162,53 @@ const abi = [
 	},
 	{
 		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_index",
+				"type": "uint8"
+			}
+		],
+		"name": "get_command_traject_list_index",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_command_traject_list_size",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
 		"inputs": [],
 		"name": "get_current_command_id",
 		"outputs": [
@@ -251,6 +298,32 @@ const abi = [
 			}
 		],
 		"name": "get_product_commands_size",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_trajectID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_product_emission",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -537,7 +610,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x70B621393c4498694288786Bc628fBd17c732fd2';
+const contract_address = '0x66e3DCcD2Bb9ae2a364Bb57A70d46CEDeb26Bc3B';
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
@@ -884,7 +957,7 @@ async Get_product_command(UPC, unique) {
         <Text style={styles.text}> scan a product to {this.state.function}</Text>
         <QRCodeScanner
             reactivate={true}
-            reactivateTimeout={1000}
+            reactivateTimeout={2000}
             showMarker={true}
             onRead={this.onRead}
         />    

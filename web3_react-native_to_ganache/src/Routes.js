@@ -18,8 +18,14 @@ const mainStack = createStackNavigator(
         Trucker: Trucker,
         Info: Info,
         ProductInfo: ProductInfo,
-        v1: v1
+
     },
+    {
+        defaultNavigationOptions: {
+        headerShown: false
+    }
+    }
+    
 );
 
 const AppContainer = createAppContainer(mainStack);
