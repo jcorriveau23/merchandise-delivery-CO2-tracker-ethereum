@@ -250,12 +250,12 @@ contract Command_preparator{
         return true;
     }
 
-    // new_traject_ID
+    // new_traject
     // description: create a new traject
     // input: N/A
     // return: the trajectID of the new traject (index of the trajects list)
     function new_traject() public returns(uint trajectID){
-        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
+        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
         
         if(_trajectID < D.numTrajects){   
             require(D.trajects[_trajectID].loaded == true, "already have an open traject");  
@@ -276,9 +276,11 @@ contract Command_preparator{
 
         return (D.numTrajects - 1);
     }
+    
     function loading_completed(string memory _IpfsTrajectHash) public returns(bool){
         uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
         require(D.trajects[_trajectID].loaded == false, "traject is already loaded");
+        require(D.trajects[_trajectID].nbTrailers > 0, "a trailer must be assigned to this traject before closing");
         D.trajects[_trajectID].loaded = true;
         D.trajects[_trajectID].ipfsTrajectHash = _IpfsTrajectHash;
     }
@@ -378,6 +380,7 @@ contract Command_preparator{
         require(D.trajects[_trajectID].started == true, "this traject must be started");
         require(D.trajects[_trajectID].done == false, "this traject must be started");
         require(D.trajects[_trajectID].truckID == _truckID, "must be the same truck as traject started");
+        require(D.trajects[_trajectID].co2Emission < _CO2Counter, "CO2 emission of a traject cant be negative");
         
         D.trajects[_trajectID].done = true;
         D.trajects[_trajectID].co2Emission = _CO2Counter - D.trajects[_trajectID].co2Emission;
