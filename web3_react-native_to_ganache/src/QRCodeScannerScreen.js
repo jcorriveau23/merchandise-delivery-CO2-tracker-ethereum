@@ -610,7 +610,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x66e3DCcD2Bb9ae2a364Bb57A70d46CEDeb26Bc3B';
+const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
@@ -961,7 +961,6 @@ async Get_product_command(UPC, unique) {
             showMarker={true}
             onRead={this.onRead}
         />    
-        
       </View>
     );
   }

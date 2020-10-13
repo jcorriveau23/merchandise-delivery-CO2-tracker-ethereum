@@ -610,7 +610,7 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x66e3DCcD2Bb9ae2a364Bb57A70d46CEDeb26Bc3B';
+const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
 
 const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
@@ -775,7 +775,7 @@ export default class OrderPicker extends Component {
 
 			Alert.alert('Order closed', 'Order ID: ' + this.state.commandID + '\n' + 'IPFS hash: ' + IpfsURL);
 			this.setState({ IpfsURL: IpfsURL })
-			await AsyncStorage.clear();
+			AsyncStorage.removeItem("order");
 
 		} catch (error) {
 			if (error.toString().includes("user has no open order")) {
@@ -795,7 +795,7 @@ export default class OrderPicker extends Component {
 			return orderInfo;
 		}
 		catch (e) {
-			Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + commandID);
+			//Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + commandID);
 		}
 	}
 	render() {
@@ -893,7 +893,7 @@ const styles = StyleSheet.create({
 	text: {
 		fontSize: 15,
 		textAlign: "justify",
-		margin: 10
+		margin: 5
 	},
 	ipfs: {
 		fontSize: 10,
@@ -916,6 +916,6 @@ const styles = StyleSheet.create({
 		marginVertical: 8,
 		borderBottomColor: '#737373',
 		borderBottomWidth: StyleSheet.hairlineWidth,
-	},
+	}
 
 });

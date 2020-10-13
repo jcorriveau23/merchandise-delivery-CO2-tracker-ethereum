@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {View, Text, Button, StyleSheet, Alert, AsyncStorage, Linking, Dimensions, ImageBackground} from 'react-native';
-import {NavigationEvents} from "react-navigation";
+import React, { Component } from 'react';
+import { View, Text, Button, StyleSheet, Alert, AsyncStorage, Linking, Dimensions, ImageBackground } from 'react-native';
+import { NavigationEvents } from "react-navigation";
 import './shim';
 
 const abi = [
@@ -610,59 +610,58 @@ const abi = [
 		"type": "function"
 	}
 ];
-const contract_address = '0x66e3DCcD2Bb9ae2a364Bb57A70d46CEDeb26Bc3B';
+const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
 
 const Web3 = require('web3');
-const IPFS  = require('ipfs-mini');
-const ipfs = new IPFS({host: "ipfs.infura.io", port: 5001, protocol: "https"});
+const IPFS = require('ipfs-mini');
+const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" });
 
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
-const mnemonic ='wagon sick artefact august more home program science famous fun magnet crew'; // 12 word mnemonic
+const mnemonic = 'wagon sick artefact august more home program science famous fun magnet crew'; // 12 word mnemonic
 const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
 const web3 = new Web3(Provider);
 const contract = new web3.eth.Contract(abi, contract_address);
 const privateKey = '0x2f5a91464049996a4948ed874409f4cfc56c775ee89760bf9db212927668acb7'
 const publicKey = '0xf9Bb59aF9eC60D64274a4d2a61D55CB004FBEa5e'
 
+const Separator = () => (
+	<View style={styles.separator} />
+);
+
 export default class LoadingAttendant extends Component {
 
-    constructor(props){
-        super(props);
-        this.state = {
+	constructor(props) {
+		super(props);
+		this.state = {
 			commandID: 0,
-            trajectInfo: "",
-    
-            trajectID: 0,
-            totalWeight: 0,
-            totalVolume: 0,
-            done: false
-        };
+			trajectInfo: "",
+
+			trajectID: 0,
+			totalWeight: 0,
+			totalVolume: 0,
+			done: false
+		};
 	}
-	async going_back(){
+	async going_back() {
 		var commandID = await this.props.navigation.getParam("data", "No data read");
 		var functions = await this.props.navigation.getParam("function", "No data read");
 		var added = await this.props.navigation.getParam("added", "No data read");
 		var trailerID = await this.props.navigation.getParam("trailerID", "No data read");
 
-		console.log(commandID);
-		console.log(trailerID);
-		console.log(functions);
-		console.log(added);
-
-		this.setState({commandID: commandID});
-		this.setState({function: functions});
+		this.setState({ commandID: commandID });
+		this.setState({ function: functions });
 
 		// info has been added to the traject
-		if(added == true){	
+		if (added == true) {
 			var currentTraject = [];
 			var currentTrajectString = "";
 
 			// async storage the current traject info	
 			var traject = await AsyncStorage.getItem('traject');
 
-			
-			if(functions.includes("traject")){
+
+			if (functions.includes("traject")) {
 				var orderInfo = await contract.methods.get_command_info(commandID).call();
 
 				var newCommand = {
@@ -672,8 +671,8 @@ export default class LoadingAttendant extends Component {
 				}
 
 				await this.get_traject_info(this.state.trajectID, false);
-	
-				if(traject == null){
+
+				if (traject == null) {
 					// no traject stored first command added
 					currentTraject.push(newCommand);
 					var jsonTraject = {
@@ -683,16 +682,16 @@ export default class LoadingAttendant extends Component {
 					};
 					currentTrajectString = JSON.stringify(jsonTraject);
 				}
-				else{
+				else {
 					var currentTrajectJSON = JSON.parse(traject);
 					currentTrajectJSON['commandList'].push(newCommand);
 					currentTrajectString = JSON.stringify(currentTrajectJSON);
 				}
 
-				}	
-			
-			else if(functions.includes("trailer")){
-				if(traject == null){
+			}
+
+			else if (functions.includes("trailer")) {
+				if (traject == null) {
 					// no traject stored first trailer added
 					var jsonTraject = {
 						"trajectID": this.state.trajectID,
@@ -702,193 +701,237 @@ export default class LoadingAttendant extends Component {
 					jsonTraject["trailerIDs"].push(trailerID)
 					currentTrajectString = JSON.stringify(jsonTraject);
 				}
-				else{
+				else {
 					var currentTrajectJSON = JSON.parse(traject);
 					currentTrajectJSON['trailerIDs'].push(trailerID);
 					currentTrajectString = JSON.stringify(currentTrajectJSON);
 				}
 			}
 			AsyncStorage.setItem('traject', currentTrajectString);
-			console.log(currentTrajectString);
 		}
-			
+
 
 	}
 
-    async componentDidMount(){
-        var trajectID = await contract.methods.get_current_trajectID().call();
-        await this.get_traject_info(trajectID, false);
-		this.setState({trajectID: trajectID});
+	async componentDidMount() {
+		var trajectID = await contract.methods.get_current_trajectID().call();
+		await this.get_traject_info(trajectID, false);
+		this.setState({ trajectID: trajectID });
 	}
-	
-    async init_traject() {
 
-        const data = contract.methods.new_traject().encodeABI();
-        const nonce = await web3.eth.getTransactionCount(publicKey);
-        const signedTx = await web3.eth.accounts.signTransaction(
-            {
-                nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
-                to: contract_address,
-                data: data,
-            },
-            privateKey
-        );
-        try{
-            await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    
-            var newtrajectID = await contract.methods.get_current_trajectID().call();
-            this.setState({trajectID: newtrajectID});
-            await this.get_traject_info(newtrajectID, false);
-    
-            Alert.alert('traject created', 'traject ID: ' + this.state.trajectID);  
-        }catch(error){
-            if (error.toString().includes("already have an open traject")) {
-                Alert.alert('Error: user already have an open traject', 'open traject ID: ' + this.state.trajectID);
-            } 
-        }
+	async init_traject() {
+
+		const data = contract.methods.new_traject().encodeABI();
+		const nonce = await web3.eth.getTransactionCount(publicKey);
+		const signedTx = await web3.eth.accounts.signTransaction(
+			{
+				nonce: nonce,
+				gasLimit: '0x200710',
+				gasPrice: '0x0A',
+				to: contract_address,
+				data: data,
+			},
+			privateKey
+		);
+		try {
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+			var newtrajectID = await contract.methods.get_current_trajectID().call();
+			this.setState({ trajectID: newtrajectID });
+			await this.get_traject_info(newtrajectID, false);
+
+			Alert.alert('traject created', 'traject ID: ' + this.state.trajectID);
+		} catch (error) {
+			if (error.toString().includes("already have an open traject")) {
+				Alert.alert('Error: user already have an open traject', 'open traject ID: ' + this.state.trajectID);
+			}
+		}
 	}
-	
-    async loading_completed(){
 
-		try{
+	async loading_completed() {
+
+		try {
 			var traject = await AsyncStorage.getItem('traject');
-			var jsonTraject = JSON.parse(traject); 
-			jsonTraject['totWeight'] = this.state.trajectInfo['1'];
-			jsonTraject['totVolume'] = this.state.trajectInfo['2'];
+			var jsonTraject = JSON.parse(traject);
+			jsonTraject['totWeight'] = this.state.trajectInfo['0'];
+			jsonTraject['totVolume'] = this.state.trajectInfo['1'];
 			var hash = await ipfs.add(JSON.stringify(jsonTraject));
-			
-	
-			var IpfsURL = 'https://ipfs.infura.io/ipfs/'+hash;
-	
+
+
+			var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
+
 			console.log(IpfsURL);
 		}
-		catch(error){
+		catch (error) {
 			console.log(error);
-			if(error.toString().includes("null is not an object")){
+			if (error.toString().includes("null is not an object")) {
 				Alert.alert('Error: nothing in traject', 'wont store order in IPFS\ntrajectID: ' + this.state.trajectID);
 				var hash = 0; //
 			}
-			else{
+			else {
 				Alert.alert('Error: IPFS Storing did not work', 'trajectID: ' + this.state.trajectID);
 				return -1;
 			}
 		}
 
-        const data = contract.methods.loading_completed(hash).encodeABI();
-        const nonce = await web3.eth.getTransactionCount(publicKey);
-        const signedTx = await web3.eth.accounts.signTransaction(
-            {
-                nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
-                to: contract_address,
-                data: data,
-            },
-            privateKey
-        );
-        try{
-            await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            await this.get_traject_info(this.state.trajectID, false);
-    
-			Alert.alert('traject loaded', 'traject ID: ' + this.state.trajectID);  
-        }catch(error){
-            if (error.toString().includes("traject is already loaded")) {
-                Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
-            } 
-        }
+		const data = contract.methods.loading_completed(hash).encodeABI();
+		const nonce = await web3.eth.getTransactionCount(publicKey);
+		const signedTx = await web3.eth.accounts.signTransaction(
+			{
+				nonce: nonce,
+				gasLimit: '0x200710',
+				gasPrice: '0x0A',
+				to: contract_address,
+				data: data,
+			},
+			privateKey
+		);
+		try {
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			await this.get_traject_info(this.state.trajectID, false);
+
+			Alert.alert('traject ready to go', 'traject ID: ' + this.state.trajectID);
+			AsyncStorage.removeItem("traject");
+		} catch (error) {
+			if (error.toString().includes("traject is already loaded")) {
+				Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
+			}
+		}
 	}
-	
-    async get_traject_info(trajectID, alert){
-        console.log('get_command_info');
-        try {
-          var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
-          this.setState({trajectInfo: trajectInfo});
-          if(alert == true){
-            Alert.alert('Traject info', 'Traject ID: ' + commandID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
-          }
-          return trajectInfo;
-        }
-        catch(e){
-          Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
-        }
-    }
-  render() {
-    return (
-      <View style={styles.container}>
-        <NavigationEvents onDidFocus={() => this.going_back()} />
-		<View style={styles.header}>
-        <ImageBackground
-            source={require("../asset/header.png")}
-            style={styles.imageBackground}
-            resizeMode="contain"
-        >
-        <Text style={styles.title}>Loading Attendant</Text>
-        </ImageBackground>
-        </View>
-        <Button
-          title={"init new traject"}
-          onPress={() => this.init_traject()}
-        /> 
-        <Button
-          title={"loading completed"}
-          onPress={() => this.loading_completed()}
-        /> 
-        <Text>Current traject ID : {this.state.trajectID}</Text>
-		<Text>traject total weight: {this.state.trajectInfo['0']}</Text>
-		<Text>traject total volume: {this.state.trajectInfo['1']}</Text>
-		<Text>traject CO2 emission: {this.state.trajectInfo['2']}</Text>
-        <Text>traject loaded: {String(this.state.trajectInfo['3'])}</Text>
-        <Text>traject started: {String(this.state.trajectInfo['4'])}</Text>
-		<Text>traject done: {String(this.state.trajectInfo['5'])}</Text>
-		<Text style={{color: 'blue'}} 
-			onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/"+this.state.trajectInfo['6'])}
-			>IPFS hash: {String(this.state.trajectInfo['6'])}
-		</Text>
-        <Button
-          title={"Associate trailer to traject"}
-          onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-			  data: "associate_trailer",
-			  trajectID: this.state.trajectID
-          })}
-        />
-        <Button
-          title={"add command"}
-          onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-              data: "associate_traject",
-              trajectID: this.state.trajectID
-            })}
-        />
-      </View>
-    );
-  }
+
+	async get_traject_info(trajectID, alert) {
+		console.log('get_command_info');
+		try {
+			var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
+			this.setState({ trajectInfo: trajectInfo });
+			if (alert == true) {
+				Alert.alert('Traject info', 'Traject ID: ' + commandID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
+			}
+			return trajectInfo;
+		}
+		catch (e) {
+			//Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
+		}
+	}
+	render() {
+		return (
+			<View style={styles.container}>
+				<NavigationEvents onDidFocus={() => this.going_back()} />
+				<View style={styles.header}>
+					<ImageBackground
+						source={require("../asset/header.png")}
+						style={styles.imageBackground}
+						resizeMode="contain"
+					>
+						<Text style={styles.title}>Loading Attendant</Text>
+					</ImageBackground>
+				</View>
+				<View>
+					<Button
+						color={'green'}
+						title={"init new traject"}
+						onPress={() => this.init_traject()}
+					/>
+				</View>
+				<Text style={styles.descriptionText}>Initiate a traject</Text>
+				<Separator />
+				<View>
+					<Text style={styles.textTitle}>Current traject ID : {this.state.trajectID}</Text>
+					<Text style={styles.text}>traject total weight: {this.state.trajectInfo['0']}</Text>
+					<Text style={styles.text}>traject total volume: {this.state.trajectInfo['1']}</Text>
+					<Text style={styles.text}>traject CO2 emission: {this.state.trajectInfo['2']}</Text>
+					<Text style={styles.text}>traject Ready: {String(this.state.trajectInfo['3'])}</Text>
+					<Text style={styles.ipfsHash}
+						onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + this.state.trajectInfo['6'])}
+					>IPFS hash: {String(this.state.trajectInfo['6'])}
+					</Text>
+				</View>
+				<Separator />
+				<View>
+					<Button
+						color={'green'}
+						title={"Associate trailer to traject"}
+						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
+							data: "associate_trailer",
+							trajectID: this.state.trajectID
+						})}
+					/>
+				</View>
+				<Text style={styles.descriptionText}>Associate a trailer to the traject</Text>
+				<Separator />
+				<View>
+					<Button
+						color={'green'}
+						title={"add command"}
+						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
+							data: "associate_traject",
+							trajectID: this.state.trajectID
+						})}
+					/>
+				</View>
+				<Text style={styles.descriptionText}>Associate a command to a traject</Text>
+				<Separator />
+				<View>
+					<Button
+						color={'#e00000'}
+						title={"loading completed"}
+						onPress={() => this.loading_completed()}
+					/>
+				</View>
+				<Text style={styles.descriptionText}>Close the traject and mark it as ready to go. Store the traject content en IPFS.</Text>
+			</View>
+		);
+	}
 }
 
 const width = Dimensions.get("screen").width;
 
 const styles = StyleSheet.create({
-  container:{
-    flex: 1,
-    backgroundColor: "white"
-  },
-  header: {
-    marginTop: 0
-  },
-  text: {
-    fontSize: 20,
-    textAlign: "center",
-    margin: 10
-  },
-  imageBackground: {
-    width: width*0.4,
-    height: width*0.4,
-    alignItems: 'center'
-  },
-  title: {
-    color: 'white',
-    marginTop: 25,
-    fontWeight: 'bold',
-    fontSize: 15
-  }
+	container: {
+		flex: 1,
+		backgroundColor: "white"
+	},
+	header: {
+		marginTop: 0
+	},
+	textTitle: {
+		fontSize: 19,
+		textAlign: "center",
+		fontWeight: "bold",
+		textDecorationLine: 'underline'
+	},
+	text: {
+		fontSize: 15,
+		textAlign: "center",
+		margin: 0
+	},
+	ipfsHash: {
+		fontSize: 10,
+		textAlign: "center",
+		color: 'blue',
+		fontWeight: "bold",
+		margin: 5
+	},
+	descriptionText: {
+		fontSize: 15,
+		textAlign: "justify",
+		margin: 5
+	},
+	imageBackground: {
+		width: width * 0.4,
+		height: width * 0.4,
+		alignItems: 'center'
+	},
+	title: {
+		color: 'white',
+		marginTop: 25,
+		fontWeight: 'bold',
+		fontSize: 15
+	},
+	separator: {
+		marginVertical: 8,
+		borderBottomColor: '#737373',
+		borderBottomWidth: StyleSheet.hairlineWidth,
+	}
+
 });

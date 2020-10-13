@@ -6,7 +6,7 @@ import OrderPicker from "./OrderPicker";
 import LoadingAttendant from "./LoadingAttendant";
 import Trucker from "./Trucker";
 import Info from "./Info";
-import v1 from "./v1";
+import PartDischarge from "./PartDischarge";
 import ProductInfo from "./Product_info";
 
 const mainStack = createStackNavigator(
@@ -18,6 +18,7 @@ const mainStack = createStackNavigator(
         Trucker: Trucker,
         Info: Info,
         ProductInfo: ProductInfo,
+        PartDischarge: PartDischarge
 
     },
     {
