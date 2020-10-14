@@ -3,6 +3,8 @@ import { View, Text, Button, StyleSheet, Alert, Dimensions, ImageBackground, Lin
 import { NavigationEvents, SafeAreaView } from "react-navigation";
 import './shim';
 
+import Container from './Container';
+
 const abi = [
 	{
 		"constant": false,
@@ -640,6 +642,7 @@ const renderItem = ({ item }) => (
 );
 
 export default class Info extends Component {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -651,10 +654,9 @@ export default class Info extends Component {
 			},
 			trajectInfo: "",
 			orderInfo: "",
-
-
 		};
 	}
+
 	async going_back() {
 		var ProductQrCode = await this.props.navigation.getParam("data", "No data read");
 		if (ProductQrCode != "No data read") {
@@ -664,6 +666,7 @@ export default class Info extends Component {
 			var size = this.Get_product_info(this.state.UPC, this.state.Unique);
 		}
 	}
+
 	async Get_product_info(UPC, unique) {
 		var lenght = 0;
 		var commandLenght;
@@ -732,6 +735,7 @@ export default class Info extends Component {
 		this.setState({ Json_Product_info: JsonProductInfo })
 		return commandLenght;
 	}
+
 	async get_traject_info(trajectID) {
 		try {
 			var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
@@ -742,6 +746,7 @@ export default class Info extends Component {
 			Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
 		}
 	}
+
 	async get_command_info(commandID) {
 		try {
 			var orderInfo = await contract.methods.get_command_info(commandID).call();
@@ -754,7 +759,7 @@ export default class Info extends Component {
 	}
 	render() {
 		return (
-			<SafeAreaView style={styles.container}>
+			<Container>
 				<NavigationEvents onDidFocus={() => this.going_back()} />
 				<View style={styles.header}>
 					<ImageBackground
@@ -780,7 +785,7 @@ export default class Info extends Component {
 					<Text style={styles.textBold}>UPC: {this.state.UPC}</Text>
 					<Text style={styles.textBold}>Unique: {this.state.Unique}</Text>
 					{this.state.Json_Product_info.commandIDList.map((command, index) => {
-						return <View>
+						return <View key={command.commandID}>
 							<Text style={styles.textBold}>command ID: {command.commandID}</Text>
 							<Text style={styles.ipfs}
 								onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + command.commandHash)}
@@ -789,13 +794,15 @@ export default class Info extends Component {
 							{
 								command.trajectList.map((traject, index) => {
 									return <>
-										<Text style={styles.textBold}>  traject ID: {traject.trajectID} </Text>
-										<Text style={styles.ipfs}
-											onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + traject.trajectHash)}
-										>IPFS traject hash: {String(traject.trajectHash)}
-										</Text>
-										<Text style={styles.text}>      traject's total': {traject.trajectCO2Emission} kg CO2 éq.</Text>
-										<Text>      product's part: {traject.ProductCO2EmissionPart} kg CO2 éq.</Text>
+										<View key={command.commandID}>
+											<Text style={styles.textBold}>  traject ID: {traject.trajectID} </Text>
+											<Text style={styles.ipfs}
+												onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + traject.trajectHash)}
+											>IPFS traject hash: {String(traject.trajectHash)}
+											</Text>
+											<Text style={styles.text}>      traject's total': {traject.trajectCO2Emission} kg CO2 éq.</Text>
+											<Text>      product's part: {traject.ProductCO2EmissionPart} kg CO2 éq.</Text>
+										</View>
 									</>
 								}
 								)
@@ -804,7 +811,7 @@ export default class Info extends Component {
 					})}
 					<Text style={styles.textBold}>Product total transport emissions: {this.state.Json_Product_info['productTotEmission']}  kg CO2 éq.</Text>
 				</View>
-			</SafeAreaView>
+			</Container >
 		);
 	}
 }

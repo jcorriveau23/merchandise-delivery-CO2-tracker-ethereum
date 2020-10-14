@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import {View, Text, Button, StyleSheet, Dimensions, ImageBackground} from 'react-native';
+import React, { Component } from 'react';
+import { View, Text, Button, StyleSheet, Dimensions, ImageBackground } from 'react-native';
 
 const Separator = () => (
   <View style={styles.separator} />
@@ -12,11 +12,11 @@ export default class Home extends Component {
       <View style={styles.container}>
         <View style={styles.header}>
           <ImageBackground
-              source={require("../asset/header.png")}
-              style={styles.imageBackground}
-              resizeMode="contain"
+            source={require("../asset/header.png")}
+            style={styles.imageBackground}
+            resizeMode="contain"
           >
-          <Text style={styles.title}>Home</Text>
+            <Text style={styles.title}>Home</Text>
           </ImageBackground>
         </View>
         <View>
@@ -27,7 +27,7 @@ export default class Home extends Component {
           />
           <Text style={styles.text}>Register Product, initiate an order, link unique products to order and when done, store the order content on IPFS</Text>
         </View>
-        <Separator/>
+        <Separator />
         <View>
           <Button
             title={"Loading attendant App"}
@@ -36,7 +36,7 @@ export default class Home extends Component {
           />
           <Text style={styles.text}>Initiate a traject, link trailer to traject, link order to traject and when done, store the traject content on IPFS</Text>
         </View>
-        <Separator/>
+        <Separator />
         <View>
           <Button
             title={"Trucker App"}
@@ -45,7 +45,7 @@ export default class Home extends Component {
           />
           <Text style={styles.text}>Grab a traject ready to be deliver, link his truck to the traject, indicate when the traject started, indicate when the traject is done and add CO2 emissions to traject</Text>
         </View>
-        <Separator/>
+        <Separator />
         <View>
           <Button
             title={"Client App"}
@@ -62,7 +62,7 @@ export default class Home extends Component {
 const width = Dimensions.get("screen").width;
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     flex: 1,
     backgroundColor: "white"
   },
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     margin: 10
   },
   imageBackground: {
-    width: width*0.4,
-    height: width*0.4,
+    width: width * 0.4,
+    height: width * 0.4,
     alignItems: 'center'
   },
   title: {

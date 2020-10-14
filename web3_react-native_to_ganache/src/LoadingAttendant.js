@@ -793,8 +793,12 @@ export default class LoadingAttendant extends Component {
 			Alert.alert('traject ready to go', 'traject ID: ' + this.state.trajectID);
 			AsyncStorage.removeItem("traject");
 		} catch (error) {
+			console.log(error);
 			if (error.toString().includes("traject is already loaded")) {
 				Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
+			}
+			else if(error.toString().includes("a trailer must be assigned")){
+				Alert.alert('Error: You need to assign a trailer', 'traject ID: ' + this.state.trajectID);
 			}
 		}
 	}

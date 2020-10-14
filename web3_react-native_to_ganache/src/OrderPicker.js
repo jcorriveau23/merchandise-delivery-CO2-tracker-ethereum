@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, StyleSheet, Alert, AsyncStorage, Linking, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, Button, StyleSheet, Alert, Linking, Dimensions, ImageBackground, AsyncStorage } from 'react-native';
 import { NavigationEvents } from "react-navigation";
 import './shim';
 
@@ -799,7 +799,9 @@ export default class OrderPicker extends Component {
 		}
 	}
 	render() {
+		/*console.disableYellowBox = true;*/
 		return (
+			
 			<View style={styles.container}>
 				<NavigationEvents onDidFocus={() => this.going_back()} />
 				<View style={styles.header}>

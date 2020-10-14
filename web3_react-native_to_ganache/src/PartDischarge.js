@@ -909,7 +909,7 @@ export default class PartDischarge extends Component {
                 <View>
                     <Text style={styles.textTitle}>Select order you are discharging!</Text>
                     {this.state.commandList.map((command, index) => {
-                        return <View>
+                        return <View key={command.commandID}>
                             <Text style={styles.textList} onPress={() => this.dischargeOrder(index)} >{command.commandID}</Text>
                         </View>
                     })
@@ -917,7 +917,7 @@ export default class PartDischarge extends Component {
 
                     <Text style={styles.textTitle}>Select Trailer you are discharging! </Text>
                     {this.state.trailerIds.map((trailer, index) => {
-                        return <View>
+                        return <View key={trailer.trailerID}>
                             <Text style={styles.textList} onPress={() => this.dischargeTrailer(index)} >{trailer.trailerID}</Text>
                         </View>
                     })
