@@ -380,7 +380,7 @@ contract Command_preparator{
         require(D.Itinerarys[_ItineraryID].started == true, "this Itinerary must be started");
         require(D.Itinerarys[_ItineraryID].done == false, "this Itinerary must be started");
         require(D.Itinerarys[_ItineraryID].truckID == _truckID, "must be the same truck as Itinerary started");
-        require(D.Itinerarys[_ItineraryID].co2Emission < _CO2Counter, "CO2 emission of an Itinerary cant be negative");
+        require(D.Itinerarys[_ItineraryID].co2Emission <= _CO2Counter, "CO2 emission of an Itinerary cant be negative");
         
         D.Itinerarys[_ItineraryID].done = true;
         D.Itinerarys[_ItineraryID].co2Emission = _CO2Counter - D.Itinerarys[_ItineraryID].co2Emission;
