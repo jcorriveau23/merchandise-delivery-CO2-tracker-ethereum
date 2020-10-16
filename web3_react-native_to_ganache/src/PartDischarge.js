@@ -4,613 +4,613 @@ import { NavigationEvents } from "react-navigation";
 import './shim';
 
 const abi = [
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_unique",
-                "type": "uint256"
-            }
-        ],
-        "name": "Associate_Command",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_commandID",
-                "type": "uint256"
-            }
-        ],
-        "name": "Associate_Traject",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_weight",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_volume",
-                "type": "uint256"
-            }
-        ],
-        "name": "New_product",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_trailerID",
-                "type": "uint256"
-            }
-        ],
-        "name": "associate_trailer",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "ipfsHash",
-                "type": "string"
-            }
-        ],
-        "name": "command_completed",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_commandID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_command_info",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            },
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_commandID",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint8",
-                "name": "_index",
-                "type": "uint8"
-            }
-        ],
-        "name": "get_command_traject_list_index",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_commandID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_command_traject_list_size",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "get_current_command_id",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "get_current_trajectID",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "get_numUPC",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "nb",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_unique",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_index",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_product_commandID",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_unique",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_product_commands_size",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_trajectID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_product_emission",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_trailerID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_trailer_current_traject",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_trajectID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_traject_emission",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_trajectID",
-                "type": "uint256"
-            }
-        ],
-        "name": "get_traject_info",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            },
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "get_trucker_current_trajectID",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            }
-        ],
-        "name": "get_upc_Volume",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "Volume",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_upc",
-                "type": "string"
-            }
-        ],
-        "name": "get_upc_weight",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "Weight",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_trajectID",
-                "type": "uint256"
-            }
-        ],
-        "name": "grab_traject",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "_IpfsTrajectHash",
-                "type": "string"
-            }
-        ],
-        "name": "loading_completed",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [],
-        "name": "new_command",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "commandID",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [],
-        "name": "new_traject",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "trajectID",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_CO2Counter",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_truckID",
-                "type": "uint256"
-            }
-        ],
-        "name": "traject_start",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_CO2Counter",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_truckID",
-                "type": "uint256"
-            }
-        ],
-        "name": "traject_stop",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_unique",
+				"type": "uint256"
+			}
+		],
+		"name": "Associate_Command",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "Associate_Itinerary",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_start",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_stop",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_weight",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_volume",
+				"type": "uint256"
+			}
+		],
+		"name": "New_product",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "associate_trailer",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "ipfsHash",
+				"type": "string"
+			}
+		],
+		"name": "command_completed",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_info",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_index",
+				"type": "uint8"
+			}
+		],
+		"name": "get_command_Itinerary_list_index",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_command_Itinerary_list_size",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_command_info",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_current_ItineraryID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_current_command_id",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_numUPC",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "nb",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_unique",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "get_product_commandID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_unique",
+				"type": "uint256"
+			}
+		],
+		"name": "get_product_commands_size",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_product_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_trailerID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_trailer_current_Itinerary",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "get_trucker_current_ItineraryID",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			}
+		],
+		"name": "get_upc_Volume",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "Volume",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_upc",
+				"type": "string"
+			}
+		],
+		"name": "get_upc_weight",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "Weight",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "grab_Itinerary",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_IpfsItineraryHash",
+				"type": "string"
+			}
+		],
+		"name": "loading_completed",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "new_Itinerary",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "new_command",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "commandID",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
 ];
-const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
+const contract_address = '0x2CE6a9050599abc80f5AECd93ecfAE30fF1A4F90';
 
 const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
@@ -647,38 +647,38 @@ export default class PartDischarge extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            trajectInfo: "",
+            ItineraryInfo: "",
 
-            trajectID: 0,
+            ItineraryID: 0,
             trailerIds: [],
             commandList: []
         };
     }
 
     async componentDidMount() {
-        var trajectInfo = await this.props.navigation.getParam("data", "No data read");
-        this.setState({ trajectInfo: trajectInfo });
+        var ItineraryInfo = await this.props.navigation.getParam("data", "No data read");
+        this.setState({ ItineraryInfo: ItineraryInfo });
 
-        var hash = trajectInfo['6'];
+        var hash = ItineraryInfo['6'];
 
-        var trajectContent = await this.ipfsRead(hash);
-        var trajectContentJson = JSON.parse(trajectContent)
+        var ItineraryContent = await this.ipfsRead(hash);
+        var ItineraryContentJson = JSON.parse(ItineraryContent)
         this.setState({
-            trajectID: trajectContentJson.trajectID,
-            trailerIds: trajectContentJson['trailerIDs'],
-            commandList: trajectContentJson['commandList'],
+            ItineraryID: ItineraryContentJson.ItineraryID,
+            trailerIds: ItineraryContentJson['trailerIDs'],
+            commandList: ItineraryContentJson['commandList'],
         });
     }
 
-    async get_traject_info(trajectID) {
+    async get_Itinerary_info(ItineraryID) {
         try {
-            var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
-            this.setState({ trajectInfo: trajectInfo });
+            var ItineraryInfo = await contract.methods.get_Itinerary_info(ItineraryID).call();
+            this.setState({ ItineraryInfo: ItineraryInfo });
 
-            return trajectInfo;
+            return ItineraryInfo;
         }
         catch (e) {
-            Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
+            Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
         }
     }
     async ipfsRead(hash) {
@@ -702,9 +702,9 @@ export default class PartDischarge extends Component {
         newTrailerList.splice(index, 1);
         this.setState({ trailerIds: newTrailerList })
     }
-    async init_traject() {
+    async init_Itinerary() {
 
-        const data = contract.methods.new_traject().encodeABI();
+        const data = contract.methods.new_Itinerary().encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
         const signedTx = await web3.eth.accounts.signTransaction(
             {
@@ -719,20 +719,20 @@ export default class PartDischarge extends Component {
         try {
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-            var newtrajectID = await contract.methods.get_current_trajectID().call();
-            this.setState({ trajectID: newtrajectID });
+            var newItineraryID = await contract.methods.get_current_ItineraryID().call();
+            this.setState({ ItineraryID: newItineraryID });
             return true;
 
         } catch (error) {
-            if (error.toString().includes("already have an open traject")) {
-                Alert.alert('Error: user already have an open traject', 'open traject ID: ' + this.state.trajectID);
+            if (error.toString().includes("already have an open Itinerary")) {
+                Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
             }
             return false;
         }
     }
-    async associate_traject(commandID) {
+    async associate_Itinerary(commandID) {
 
-        const data = contract.methods.Associate_Traject(commandID).encodeABI();
+        const data = contract.methods.Associate_Itinerary(commandID).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
         const signedTx = await web3.eth.accounts.signTransaction(
             {
@@ -746,12 +746,12 @@ export default class PartDischarge extends Component {
         );
         try {
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            Alert.alert('traject assign to that command', 'command ID: ' + commandID + '\nTraject ID: ' + this.state.trajectID);
+            Alert.alert('Itinerary assign to that command', 'command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
             return true;
 
         } catch (error) {
             console.log(error);
-            Alert.alert('something went wrong', 'command ID: ' + commandID + '\nTraject ID: ' + this.state.trajectID);
+            Alert.alert('something went wrong', 'command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
             return false;
         }
 
@@ -772,38 +772,38 @@ export default class PartDischarge extends Component {
         );
         try {
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            Alert.alert('trailer ID assigned to traject', "trailer ID: " + trailerID + '\ntraject ID: ' + this.state.trajectID);
+            Alert.alert('trailer ID assigned to Itinerary', "trailer ID: " + trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
             return true;
 
         } catch (error) {
             console.log(error);
-            Alert.alert('Error', 'could not added trailerID to traject\n' + "trailer ID: " + trailerID + '\ntraject ID: ' + this.state.trajectID);
+            Alert.alert('Error', 'could not added trailerID to Itinerary\n' + "trailer ID: " + trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
             return false;
         }
 
     }
-    async AsyncStorageTraject(){
-        var trajectInfo = await contract.methods.get_traject_info(this.state.trajectID).call();
-        var jsonTraject = {
-            trajectID: this.state.trajectID,
+    async AsyncStorageItinerary(){
+        var ItineraryInfo = await contract.methods.get_Itinerary_info(this.state.ItineraryID).call();
+        var jsonItinerary = {
+            ItineraryID: this.state.ItineraryID,
             trailerIDs: this.state.trailerIds,
             commandList: this.state.commandList,
-            totWeight: trajectInfo['0'],
-            totVolume: trajectInfo['1']
+            totWeight: ItineraryInfo['0'],
+            totVolume: ItineraryInfo['1']
         }
-        var jsonTrajectString = JSON.stringify(jsonTraject);
-        AsyncStorage.setItem('traject', jsonTrajectString);
+        var jsonItineraryString = JSON.stringify(jsonItinerary);
+        AsyncStorage.setItem('Itinerary', jsonItineraryString);
     }
     async loading_completed() {
 
         try {
-            var traject = await AsyncStorage.getItem('traject');
-            var hash = await ipfs.add(traject);
+            var Itinerary = await AsyncStorage.getItem('Itinerary');
+            var hash = await ipfs.add(Itinerary);
             var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
             console.log(IpfsURL);
         }
         catch (error) {
-            Alert.alert('Error: IPFS Storing did not work', 'trajectID: ' + this.state.trajectID);
+            Alert.alert('Error: IPFS Storing did not work', 'ItineraryID: ' + this.state.ItineraryID);
             return false;
         }
 
@@ -821,30 +821,30 @@ export default class PartDischarge extends Component {
         );
         try {
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            await this.get_traject_info(this.state.trajectID, false);
-            Alert.alert('traject loaded', 'traject ID: ' + this.state.trajectID);
+            await this.get_Itinerary_info(this.state.ItineraryID, false);
+            Alert.alert('Itinerary loaded', 'Itinerary ID: ' + this.state.ItineraryID);
 
-            AsyncStorage.removeItem("traject");
+            AsyncStorage.removeItem("Itinerary");
             return true;
         } catch (error) {
-            if (error.toString().includes("traject is already loaded")) {
-                Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
+            if (error.toString().includes("Itinerary is already loaded")) {
+                Alert.alert('Error: Itinerary was already loaded', 'Itinerary ID: ' + this.state.ItineraryID);
             }
             return false;
         }
     }
-    async reconstruct_traject() {
+    async reconstruct_Itinerary() {
         var Title = "";
         var message = "";
         var resolve = "";
         var valid = false;
 
-        Title = 'initiate a new traject?';
+        Title = 'initiate a new Itinerary?';
         message = "";
         resolve = await AsyncAlert(Title, message);
 
         if (resolve == 'YES') {
-            valid = await this.init_traject();
+            valid = await this.init_Itinerary();
             if (valid == true) {
 
 
@@ -852,11 +852,11 @@ export default class PartDischarge extends Component {
                 for (i; i < this.state.commandList.length; i++) {
                     valid == false;
 
-                    Title = 'Add a traject?';
-                    message = 'Do you want to add order ID: ' + this.state.commandList[i].commandID + '\nto traject ID: ' + this.state.trajectID;
+                    Title = 'Add an Itinerary?';
+                    message = 'Do you want to add order ID: ' + this.state.commandList[i].commandID + '\nto Itinerary ID: ' + this.state.ItineraryID;
                     resolve = await AsyncAlert(Title, message);
                     if (resolve == 'YES') {
-                        valid = await this.associate_traject(this.state.commandList[i].commandID);
+                        valid = await this.associate_Itinerary(this.state.commandList[i].commandID);
                     }
                     if (valid == false) {
                         var newCommandList = this.state.commandList;
@@ -869,7 +869,7 @@ export default class PartDischarge extends Component {
                     valid = false;
 
                     Title = 'Add a trailer?';
-                    message = 'Do you want to add trailer ID: ' + this.state.trailerIds[i].trailerID + '\nto traject ID: ' + this.state.trajectID;
+                    message = 'Do you want to add trailer ID: ' + this.state.trailerIds[i].trailerID + '\nto Itinerary ID: ' + this.state.ItineraryID;
                     resolve = await AsyncAlert(Title, message);
                     if (resolve == 'YES') {
                         valid = await this.associate_trailer(this.state.trailerIds[i].trailerID);
@@ -882,10 +882,10 @@ export default class PartDischarge extends Component {
                 }
                 valid = false;
 
-                Title = 'Close traject?';
-                message = 'Do you want to close traject ID: ' + this.state.trajectID;
+                Title = 'Close Itinerary?';
+                message = 'Do you want to close Itinerary ID: ' + this.state.ItineraryID;
                 resolve = await AsyncAlert(Title, message);
-                await this.AsyncStorageTraject();
+                await this.AsyncStorageItinerary();
                 if (resolve == 'YES') {
                     valid = await this.loading_completed();
                 }
@@ -929,7 +929,7 @@ export default class PartDischarge extends Component {
                     <Button
                         color={'green'}
                         title={"Good to go?"}
-                        onPress={() => this.reconstruct_traject()}
+                        onPress={() => this.reconstruct_Itinerary()}
                     />
                 </View>
                 <Separator />

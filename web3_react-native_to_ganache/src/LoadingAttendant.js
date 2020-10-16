@@ -39,7 +39,59 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"name": "Associate_Traject",
+		"name": "Associate_Itinerary",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_start",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_stop",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -129,6 +181,125 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_info",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_index",
+				"type": "uint8"
+			}
+		],
+		"name": "get_command_Itinerary_list_index",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_command_Itinerary_list_size",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_commandID",
 				"type": "uint256"
 			}
@@ -162,55 +333,8 @@ const abi = [
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_index",
-				"type": "uint8"
-			}
-		],
-		"name": "get_command_traject_list_index",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_command_traject_list_size",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
 		"inputs": [],
-		"name": "get_current_command_id",
+		"name": "get_current_ItineraryID",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -225,7 +349,7 @@ const abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "get_current_trajectID",
+		"name": "get_current_command_id",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -319,7 +443,7 @@ const abi = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "_trajectID",
+				"name": "_ItineraryID",
 				"type": "uint256"
 			}
 		],
@@ -344,84 +468,12 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"name": "get_trailer_current_traject",
+		"name": "get_trailer_current_Itinerary",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trajectID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_traject_emission",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trajectID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_traject_info",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
 			}
 		],
 		"payable": false,
@@ -431,7 +483,7 @@ const abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "get_trucker_current_trajectID",
+		"name": "get_trucker_current_ItineraryID",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -490,11 +542,11 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_trajectID",
+				"name": "_ItineraryID",
 				"type": "uint256"
 			}
 		],
-		"name": "grab_traject",
+		"name": "grab_Itinerary",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -511,7 +563,7 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_IpfsTrajectHash",
+				"name": "_IpfsItineraryHash",
 				"type": "string"
 			}
 		],
@@ -521,6 +573,21 @@ const abi = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "new_Itinerary",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "ItineraryID",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -541,76 +608,9 @@ const abi = [
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "new_traject",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "trajectID",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "traject_start",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "traject_stop",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
 	}
 ];
-const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
+const contract_address = '0x2CE6a9050599abc80f5AECd93ecfAE30fF1A4F90';
 
 const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
@@ -635,9 +635,9 @@ export default class LoadingAttendant extends Component {
 		super(props);
 		this.state = {
 			commandID: 0,
-			trajectInfo: "",
+			ItineraryInfo: "",
 
-			trajectID: 0,
+			ItineraryID: 0,
 			totalWeight: 0,
 			totalVolume: 0,
 			done: false
@@ -652,16 +652,16 @@ export default class LoadingAttendant extends Component {
 		this.setState({ commandID: commandID });
 		this.setState({ function: functions });
 
-		// info has been added to the traject
+		// info has been added to the Itinerary
 		if (added == true) {
-			var currentTraject = [];
-			var currentTrajectString = "";
+			var currentItinerary = [];
+			var currentItineraryString = "";
 
-			// async storage the current traject info	
-			var traject = await AsyncStorage.getItem('traject');
+			// async storage the current Itinerary info	
+			var Itinerary = await AsyncStorage.getItem('Itinerary');
 
 
-			if (functions.includes("traject")) {
+			if (functions.includes("Itinerary")) {
 				var orderInfo = await contract.methods.get_command_info(commandID).call();
 
 				var newCommand = {
@@ -670,58 +670,58 @@ export default class LoadingAttendant extends Component {
 					"totVolume": orderInfo['1']
 				}
 
-				await this.get_traject_info(this.state.trajectID, false);
+				await this.get_Itinerary_info(this.state.ItineraryID, false);
 
-				if (traject == null) {
-					// no traject stored first command added
-					currentTraject.push(newCommand);
-					var jsonTraject = {
-						"trajectID": this.state.trajectID,
+				if (Itinerary == null) {
+					// no Itinerary stored first command added
+					currentItinerary.push(newCommand);
+					var jsonItinerary = {
+						"ItineraryID": this.state.ItineraryID,
 						"trailerIDs": [],
-						"commandList": currentTraject
+						"commandList": currentItinerary
 					};
-					currentTrajectString = JSON.stringify(jsonTraject);
+					currentItineraryString = JSON.stringify(jsonItinerary);
 				}
 				else {
-					var currentTrajectJSON = JSON.parse(traject);
-					currentTrajectJSON['commandList'].push(newCommand);
-					currentTrajectString = JSON.stringify(currentTrajectJSON);
+					var currentItineraryJSON = JSON.parse(Itinerary);
+					currentItineraryJSON['commandList'].push(newCommand);
+					currentItineraryString = JSON.stringify(currentItineraryJSON);
 				}
 
 			}
 
 			else if (functions.includes("trailer")) {
-				if (traject == null) {
-					// no traject stored first trailer added
-					var jsonTraject = {
-						"trajectID": this.state.trajectID,
+				if (Itinerary == null) {
+					// no Itinerary stored first trailer added
+					var jsonItinerary = {
+						"ItineraryID": this.state.ItineraryID,
 						"trailerIDs": [],
 						"commandList": []
 					};
-					jsonTraject["trailerIDs"].push(trailerID)
-					currentTrajectString = JSON.stringify(jsonTraject);
+					jsonItinerary["trailerIDs"].push(trailerID)
+					currentItineraryString = JSON.stringify(jsonItinerary);
 				}
 				else {
-					var currentTrajectJSON = JSON.parse(traject);
-					currentTrajectJSON['trailerIDs'].push(trailerID);
-					currentTrajectString = JSON.stringify(currentTrajectJSON);
+					var currentItineraryJSON = JSON.parse(Itinerary);
+					currentItineraryJSON['trailerIDs'].push(trailerID);
+					currentItineraryString = JSON.stringify(currentItineraryJSON);
 				}
 			}
-			AsyncStorage.setItem('traject', currentTrajectString);
+			AsyncStorage.setItem('Itinerary', currentItineraryString);
 		}
 
 
 	}
 
 	async componentDidMount() {
-		var trajectID = await contract.methods.get_current_trajectID().call();
-		await this.get_traject_info(trajectID, false);
-		this.setState({ trajectID: trajectID });
+		var ItineraryID = await contract.methods.get_current_ItineraryID().call();
+		await this.get_Itinerary_info(ItineraryID, false);
+		this.setState({ ItineraryID: ItineraryID });
 	}
 
-	async init_traject() {
+	async init_Itinerary() {
 
-		const data = contract.methods.new_traject().encodeABI();
+		const data = contract.methods.new_Itinerary().encodeABI();
 		const nonce = await web3.eth.getTransactionCount(publicKey);
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
@@ -736,14 +736,14 @@ export default class LoadingAttendant extends Component {
 		try {
 			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-			var newtrajectID = await contract.methods.get_current_trajectID().call();
-			this.setState({ trajectID: newtrajectID });
-			await this.get_traject_info(newtrajectID, false);
+			var newItineraryID = await contract.methods.get_current_ItineraryID().call();
+			this.setState({ ItineraryID: newItineraryID });
+			await this.get_Itinerary_info(newItineraryID, false);
 
-			Alert.alert('traject created', 'traject ID: ' + this.state.trajectID);
+			Alert.alert('Itinerary created', 'Itinerary ID: ' + this.state.ItineraryID);
 		} catch (error) {
-			if (error.toString().includes("already have an open traject")) {
-				Alert.alert('Error: user already have an open traject', 'open traject ID: ' + this.state.trajectID);
+			if (error.toString().includes("already have an open Itinerary")) {
+				Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
 			}
 		}
 	}
@@ -751,11 +751,11 @@ export default class LoadingAttendant extends Component {
 	async loading_completed() {
 
 		try {
-			var traject = await AsyncStorage.getItem('traject');
-			var jsonTraject = JSON.parse(traject);
-			jsonTraject['totWeight'] = this.state.trajectInfo['0'];
-			jsonTraject['totVolume'] = this.state.trajectInfo['1'];
-			var hash = await ipfs.add(JSON.stringify(jsonTraject));
+			var Itinerary = await AsyncStorage.getItem('Itinerary');
+			var jsonItinerary = JSON.parse(Itinerary);
+			jsonItinerary['totWeight'] = this.state.ItineraryInfo['0'];
+			jsonItinerary['totVolume'] = this.state.ItineraryInfo['1'];
+			var hash = await ipfs.add(JSON.stringify(jsonItinerary));
 
 
 			var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
@@ -765,11 +765,11 @@ export default class LoadingAttendant extends Component {
 		catch (error) {
 			console.log(error);
 			if (error.toString().includes("null is not an object")) {
-				Alert.alert('Error: nothing in traject', 'wont store order in IPFS\ntrajectID: ' + this.state.trajectID);
+				Alert.alert('Error: nothing in Itinerary', 'wont store order in IPFS\nItineraryID: ' + this.state.ItineraryID);
 				var hash = 0; //
 			}
 			else {
-				Alert.alert('Error: IPFS Storing did not work', 'trajectID: ' + this.state.trajectID);
+				Alert.alert('Error: IPFS Storing did not work', 'ItineraryID: ' + this.state.ItineraryID);
 				return -1;
 			}
 		}
@@ -788,33 +788,33 @@ export default class LoadingAttendant extends Component {
 		);
 		try {
 			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-			await this.get_traject_info(this.state.trajectID, false);
+			await this.get_Itinerary_info(this.state.ItineraryID, false);
 
-			Alert.alert('traject ready to go', 'traject ID: ' + this.state.trajectID);
-			AsyncStorage.removeItem("traject");
+			Alert.alert('Itinerary ready to go', 'Itinerary ID: ' + this.state.ItineraryID);
+			AsyncStorage.removeItem("Itinerary");
 		} catch (error) {
 			console.log(error);
-			if (error.toString().includes("traject is already loaded")) {
-				Alert.alert('Error: traject was already loaded', 'traject ID: ' + this.state.trajectID);
+			if (error.toString().includes("Itinerary is already loaded")) {
+				Alert.alert('Error: Itinerary was already loaded', 'Itinerary ID: ' + this.state.ItineraryID);
 			}
 			else if(error.toString().includes("a trailer must be assigned")){
-				Alert.alert('Error: You need to assign a trailer', 'traject ID: ' + this.state.trajectID);
+				Alert.alert('Error: You need to assign a trailer', 'Itinerary ID: ' + this.state.ItineraryID);
 			}
 		}
 	}
 
-	async get_traject_info(trajectID, alert) {
+	async get_Itinerary_info(ItineraryID, alert) {
 		console.log('get_command_info');
 		try {
-			var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
-			this.setState({ trajectInfo: trajectInfo });
+			var ItineraryInfo = await contract.methods.get_Itinerary_info(ItineraryID).call();
+			this.setState({ ItineraryInfo: ItineraryInfo });
 			if (alert == true) {
-				Alert.alert('Traject info', 'Traject ID: ' + commandID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
+				Alert.alert('Itinerary info', 'Itinerary ID: ' + commandID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
 			}
-			return trajectInfo;
+			return ItineraryInfo;
 		}
 		catch (e) {
-			//Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
+			//Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
 		}
 	}
 	render() {
@@ -833,47 +833,47 @@ export default class LoadingAttendant extends Component {
 				<View>
 					<Button
 						color={'green'}
-						title={"init new traject"}
-						onPress={() => this.init_traject()}
+						title={"init new Itinerary"}
+						onPress={() => this.init_Itinerary()}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Initiate a traject</Text>
+				<Text style={styles.descriptionText}>Initiate an itinerary</Text>
 				<Separator />
 				<View>
-					<Text style={styles.textTitle}>Current traject ID : {this.state.trajectID}</Text>
-					<Text style={styles.text}>traject total weight: {this.state.trajectInfo['0']}</Text>
-					<Text style={styles.text}>traject total volume: {this.state.trajectInfo['1']}</Text>
-					<Text style={styles.text}>traject CO2 emission: {this.state.trajectInfo['2']}</Text>
-					<Text style={styles.text}>traject Ready: {String(this.state.trajectInfo['3'])}</Text>
+					<Text style={styles.textTitle}>Current Itinerary ID : {this.state.ItineraryID}</Text>
+					<Text style={styles.text}>Itinerary total weight: {this.state.ItineraryInfo['0']}</Text>
+					<Text style={styles.text}>Itinerary total volume: {this.state.ItineraryInfo['1']}</Text>
+					<Text style={styles.text}>Itinerary CO2 emission: {this.state.ItineraryInfo['2']}</Text>
+					<Text style={styles.text}>Itinerary Ready: {String(this.state.ItineraryInfo['3'])}</Text>
 					<Text style={styles.ipfsHash}
-						onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + this.state.trajectInfo['6'])}
-					>IPFS hash: {String(this.state.trajectInfo['6'])}
+						onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + this.state.ItineraryInfo['6'])}
+					>IPFS hash: {String(this.state.ItineraryInfo['6'])}
 					</Text>
 				</View>
 				<Separator />
 				<View>
 					<Button
 						color={'green'}
-						title={"Associate trailer to traject"}
+						title={"Associate trailer to Itinerary"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
 							data: "associate_trailer",
-							trajectID: this.state.trajectID
+							ItineraryID: this.state.ItineraryID
 						})}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Associate a trailer to the traject</Text>
+				<Text style={styles.descriptionText}>Associate a trailer to the itinerary</Text>
 				<Separator />
 				<View>
 					<Button
 						color={'green'}
 						title={"add command"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "associate_traject",
-							trajectID: this.state.trajectID
+							data: "associate_Itinerary",
+							ItineraryID: this.state.ItineraryID
 						})}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Associate a command to a traject</Text>
+				<Text style={styles.descriptionText}>Associate an order to an itinerary</Text>
 				<Separator />
 				<View>
 					<Button
@@ -882,7 +882,7 @@ export default class LoadingAttendant extends Component {
 						onPress={() => this.loading_completed()}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Close the traject and mark it as ready to go. Store the traject content en IPFS.</Text>
+				<Text style={styles.descriptionText}>Close the Itinerary and mark it as ready to go. Store the itinerary content in IPFS.</Text>
 			</View>
 		);
 	}

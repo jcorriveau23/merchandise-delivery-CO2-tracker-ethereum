@@ -39,7 +39,59 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"name": "Associate_Traject",
+		"name": "Associate_Itinerary",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_start",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_CO2Counter",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_truckID",
+				"type": "uint256"
+			}
+		],
+		"name": "Itinerary_stop",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -129,6 +181,125 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_emission",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_ItineraryID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_Itinerary_info",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint8",
+				"name": "_index",
+				"type": "uint8"
+			}
+		],
+		"name": "get_command_Itinerary_list_index",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_commandID",
+				"type": "uint256"
+			}
+		],
+		"name": "get_command_Itinerary_list_size",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "_commandID",
 				"type": "uint256"
 			}
@@ -162,55 +333,8 @@ const abi = [
 	},
 	{
 		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_index",
-				"type": "uint8"
-			}
-		],
-		"name": "get_command_traject_list_index",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_command_traject_list_size",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
 		"inputs": [],
-		"name": "get_current_command_id",
+		"name": "get_current_ItineraryID",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -225,7 +349,7 @@ const abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "get_current_trajectID",
+		"name": "get_current_command_id",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -319,7 +443,7 @@ const abi = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "_trajectID",
+				"name": "_ItineraryID",
 				"type": "uint256"
 			}
 		],
@@ -344,84 +468,12 @@ const abi = [
 				"type": "uint256"
 			}
 		],
-		"name": "get_trailer_current_traject",
+		"name": "get_trailer_current_Itinerary",
 		"outputs": [
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trajectID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_traject_emission",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trajectID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_traject_info",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
 			}
 		],
 		"payable": false,
@@ -431,7 +483,7 @@ const abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "get_trucker_current_trajectID",
+		"name": "get_trucker_current_ItineraryID",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -490,11 +542,11 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_trajectID",
+				"name": "_ItineraryID",
 				"type": "uint256"
 			}
 		],
-		"name": "grab_traject",
+		"name": "grab_Itinerary",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -511,7 +563,7 @@ const abi = [
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_IpfsTrajectHash",
+				"name": "_IpfsItineraryHash",
 				"type": "string"
 			}
 		],
@@ -521,6 +573,21 @@ const abi = [
 				"internalType": "bool",
 				"name": "",
 				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "new_Itinerary",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "ItineraryID",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -541,76 +608,9 @@ const abi = [
 		"payable": false,
 		"stateMutability": "nonpayable",
 		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "new_traject",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "trajectID",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "traject_start",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "traject_stop",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
 	}
 ];
-const contract_address = '0xB9FFD1b6E5fdA101da064F52e5Ed1685be4f7aCD';
+const contract_address = '0x2CE6a9050599abc80f5AECd93ecfAE30fF1A4F90';
 
 const Web3 = require('web3');
 
@@ -631,17 +631,17 @@ export default class Trucker extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			trajectInfo: "",
+			ItineraryInfo: "",
 
-			trajectID: 0,
+			ItineraryID: 0,
 
 		};
 	}
 
 	async componentDidMount() {
-		var trajectID = await contract.methods.get_trucker_current_trajectID().call();
-		await this.get_traject_info(trajectID);
-		this.setState({ trajectID: trajectID });
+		var ItineraryID = await contract.methods.get_trucker_current_ItineraryID().call();
+		await this.get_Itinerary_info(ItineraryID);
+		this.setState({ ItineraryID: ItineraryID });
 	}
 
 	async going_back() {
@@ -657,7 +657,7 @@ export default class Trucker extends Component {
 
 		this.setState({ function: functions });
 
-		// info has been added to the traject
+		// info has been added to the Itinerary
 		if (added == true) {
 
 		}
@@ -665,14 +665,14 @@ export default class Trucker extends Component {
 
 	}
 
-	async get_traject_info(trajectID) {
+	async get_Itinerary_info(ItineraryID) {
 		try {
-			var trajectInfo = await contract.methods.get_traject_info(trajectID).call();
-			this.setState({ trajectInfo: trajectInfo });
-			console.log(trajectInfo);
+			var ItineraryInfo = await contract.methods.get_Itinerary_info(ItineraryID).call();
+			this.setState({ ItineraryInfo: ItineraryInfo });
+			console.log(ItineraryInfo);
 		}
 		catch (e) {
-			//Alert.alert('Error: this command ID does not exist', 'Traject ID: ' + trajectID);
+			//Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
 		}
 	}
 
@@ -692,55 +692,55 @@ export default class Trucker extends Component {
 				<View>
 					<Button
 						color={'green'}
-						title={"grab traject"}
+						title={"grab Itinerary"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "grab_traject"
+							data: "grab_Itinerary"
 						})}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Grab a ready traject created by the loading attendant from scanning a trailer</Text>
+				<Text style={styles.descriptionText}>Grab a ready itinerary created by the loading attendant by scanning a trailer</Text>
 				<Separator />
 				<View>
 					<Button
 						color={'green'}
-						title={"start traject"}
+						title={"start Itinerary"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "traject_start"
+							data: "Itinerary_start"
 						})}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Mark the traject as started from scanning the truck CO2 counter. Store the time, truck CO2 emissions counter value and truck ID on the chain</Text>
+				<Text style={styles.descriptionText}>Mark the itinerary as started from scanning the truck CO2 counter. Store the time, truck CO2 emissions counter value and truck ID on the chain</Text>
 				<Separator />
 				<View>
-					<Text style={styles.textTitle}>Current traject ID : {this.state.trajectID}</Text>
-					<Text style={styles.text}>traject total weight: {this.state.trajectInfo['0']}</Text>
-					<Text style={styles.text}>traject total volume: {this.state.trajectInfo['1']}</Text>
-					<Text style={styles.text}>traject CO2 emission: {this.state.trajectInfo['2']}</Text>
-					<Text style={styles.text}>traject started: {String(this.state.trajectInfo['4'])}</Text>
-					<Text style={styles.text}>traject done: {String(this.state.trajectInfo['5'])}</Text>
+					<Text style={styles.textTitle}>Current Itinerary ID : {this.state.ItineraryID}</Text>
+					<Text style={styles.text}>Itinerary total weight: {this.state.ItineraryInfo['0']}</Text>
+					<Text style={styles.text}>Itinerary total volume: {this.state.ItineraryInfo['1']}</Text>
+					<Text style={styles.text}>Itinerary CO2 emission: {this.state.ItineraryInfo['2']}</Text>
+					<Text style={styles.text}>Itinerary started: {String(this.state.ItineraryInfo['4'])}</Text>
+					<Text style={styles.text}>Itinerary done: {String(this.state.ItineraryInfo['5'])}</Text>
 					<Text style={styles.ipfsHash}
-						onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + this.state.trajectInfo['6'])}
-					>IPFS hash: {String(this.state.trajectInfo['6'])}
+						onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + this.state.ItineraryInfo['6'])}
+					>IPFS hash: {String(this.state.ItineraryInfo['6'])}
 					</Text>
 				</View>
 				<Separator />
 				<View>
 					<Button
 						color={'#e00000'}
-						title={"end traject"}
+						title={"end Itinerary"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "traject_stop"
+							data: "Itinerary_stop"
 						})}
 					/>
 				</View>
-				<Text style={styles.descriptionText}>Mark a traject as completed from scanning the truck CO2 counter.</Text>
+				<Text style={styles.descriptionText}>Mark an itinerary as completed by scanning the truck CO2 counter.</Text>
 				<Separator />
 				<View>
 					<Button
 						color={'green'}
 						title={"part discharge"}
 						onPress={() => this.props.navigation.navigate("PartDischarge", {
-							data: this.state.trajectInfo
+							data: this.state.ItineraryInfo
 						})}
 					/>
 				</View>

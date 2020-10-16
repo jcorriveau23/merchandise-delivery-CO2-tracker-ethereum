@@ -40,10 +40,10 @@ export default class Info extends Component {
         <View>
           <Button
             color={'green'}
-            title={"Traject Info"}
+            title={"Itinerary Info"}
             onPress={() => this.props.navigation.navigate("ProductInfo")}
           />
-          <Text style={styles.textTodo}> To do: Get info from a traject ID</Text>
+          <Text style={styles.textTodo}> To do: Get info from an Itinerary ID</Text>
         </View>
 
       </View>

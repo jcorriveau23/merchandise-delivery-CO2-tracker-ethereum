@@ -34,7 +34,7 @@ export default class Home extends Component {
             onPress={() => this.props.navigation.navigate("LoadingAttendant")}
             color={'green'}
           />
-          <Text style={styles.text}>Initiate a traject, link trailer to traject, link order to traject and when done, store the traject content on IPFS</Text>
+          <Text style={styles.text}>Initiate an Itinerary, link trailer to Itinerary, link order to Itinerary and when done, store the Itinerary content on IPFS</Text>
         </View>
         <Separator />
         <View>
@@ -43,7 +43,7 @@ export default class Home extends Component {
             onPress={() => this.props.navigation.navigate("Trucker")}
             color={'green'}
           />
-          <Text style={styles.text}>Grab a traject ready to be deliver, link his truck to the traject, indicate when the traject started, indicate when the traject is done and add CO2 emissions to traject</Text>
+          <Text style={styles.text}>Grab an Itinerary ready to be deliver, link his truck to the Itinerary, indicate when the Itinerary started, indicate when the Itinerary is done and add CO2 emissions to Itinerary</Text>
         </View>
         <Separator />
         <View>
@@ -52,7 +52,7 @@ export default class Home extends Component {
             onPress={() => this.props.navigation.navigate("Info")}
             color={'green'}
           />
-          <Text style={styles.text}>Get info on unique product, order, traject and more importantly, on their corresponding CO2 emissions</Text>
+          <Text style={styles.text}>Get info on unique product, order, Itinerary and more importantly, on their corresponding CO2 emissions</Text>
         </View>
       </View>
     );
