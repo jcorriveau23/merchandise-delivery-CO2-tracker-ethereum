@@ -10,13 +10,13 @@ contract Command_preparator{
         Command[] commands;
         uint numCommands;
 
-        Traject[] trajects;
-        uint numTrajects;
+        Itinerary[] Itinerarys;
+        uint numItinerarys;
 
         mapping(address => uint) openCommandID;  // link the orderpicker to is current order ID
-        mapping(address => uint) LoadingAttendantOpenTrajectID;  // link the loading attendant to his current traject ID
-        mapping(address => uint) TruckerOpenTrajectID;  // link the trucker to his current traject ID
-        mapping(uint => uint) TrailerCurrentTraject; //  Ling the trailer to his current traject ID
+        mapping(address => uint) LoadingAttendantOpenItineraryID;  // link the loading attendant to his current Itinerary ID
+        mapping(address => uint) TruckerOpenItineraryID;  // link the trucker to his current Itinerary ID
+        mapping(uint => uint) TrailerCurrentItinerary; //  Ling the trailer to his current Itinerary ID
     }
 
     struct UPC {                                // store the weight and volume of a specific product (UPC)
@@ -38,8 +38,8 @@ contract Command_preparator{
     }
 
     struct Command {
-        uint[] TrajectIDs;  // dynamic list of trajectIDs taken by the command
-        uint8 size;         // keep tracks of the number of traject the command take parts in
+        uint[] ItineraryIDs;  // dynamic list of ItineraryIDs taken by the command
+        uint8 size;         // keep tracks of the number of Itinerary the command take parts in
         uint totWeight;     // total weight of the command = sums of products weight
         uint totVolume;     // total volume of the command = sums of products volume
 
@@ -48,19 +48,19 @@ contract Command_preparator{
         //uint co2Emission
     }
 
-    struct Traject {
+    struct Itinerary {
         uint[] TrailerIDs;  // dynamic list of trailerID (some truc can carry more than one trailer)
         uint8 nbTrailers;    //
-        uint truckID;       // truck that drive the traject
-        uint totWeight;     // total weight of the traject = sums of commands total weight
-        uint totVolume;     // total volume of the traject = sums of commands total volume
+        uint truckID;       // truck that drive the Itinerary
+        uint totWeight;     // total weight of the Itinerary = sums of commands total weight
+        uint totVolume;     // total volume of the Itinerary = sums of commands total volume
         // uint fromID;
         // uint toID;
-        bool loaded;         // true when the traject is fully charged
-        bool started;          // true when the traject is done => co2Emission is valid
-        bool done;          // true when the traject is done => co2Emission is valid
+        bool loaded;         // true when the Itinerary is fully charged
+        bool started;          // true when the Itinerary is done => co2Emission is valid
+        bool done;          // true when the Itinerary is done => co2Emission is valid
         uint co2Emission;   // only valid when => done = true
-        string ipfsTrajectHash;
+        string ipfsItineraryHash;
     }
 
     Data D;
@@ -158,13 +158,13 @@ contract Command_preparator{
          else{
              uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[size - 1];    // last command
              require(D.commands[index].done == true, 'a command not completed is already assigned to this product');
-             // require that the traject is done not only the last command------------------------------------------------------------------------------------
+             // require that the Itinerary is done not only the last command------------------------------------------------------------------------------------
          }
 
          D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs.push(_commandID); // add the command to the list
          D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size++;
 
-         D.commands[_commandID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to traject
+         D.commands[_commandID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to Itinerary
          D.commands[_commandID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
 
          return 1;
@@ -192,7 +192,7 @@ contract Command_preparator{
         require(_index < D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size, 'index out of bound');
         
         
-        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[_index];  // return the trajectID of the index
+        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[_index];  // return the ItineraryID of the index
     }
 
     // get_command_info
@@ -205,25 +205,25 @@ contract Command_preparator{
         return (D.commands[_commandID].totWeight, D.commands[_commandID].totVolume, D.commands[_commandID].done, D.commands[_commandID].ipfsCommandHash);
     }
     
-    // get_command_traject_list_size
-    // description: return the number of traject this command has take part of
+    // get_command_Itinerary_list_size
+    // description: return the number of Itinerary this command has take part of
     // input: _commandID
     // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_command_traject_list_size(uint _commandID) public view returns(uint8){
+    function get_command_Itinerary_list_size(uint _commandID) public view returns(uint8){
         require(_commandID < D.numCommands, 'this command does not exist');
 
         return D.commands[_commandID].size;
     }
     
-    // get_command_traject_list_index
-    // description: one trajectID of the command's trajectIDs list
+    // get_command_Itinerary_list_index
+    // description: one ItineraryID of the command's ItineraryIDs list
     // input: _commandID, _index
     // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_command_traject_list_index(uint _commandID, uint8 _index) public view returns(uint){
+    function get_command_Itinerary_list_index(uint _commandID, uint8 _index) public view returns(uint){
         require(_commandID < D.numCommands, 'this command does not exist');
         require(D.commands[_commandID].size > _index);
 
-        return D.commands[_commandID].TrajectIDs[_index];
+        return D.commands[_commandID].ItineraryIDs[_index];
     }
     
     // get_command_info
@@ -236,7 +236,7 @@ contract Command_preparator{
     }
 
     // command_completed
-    // description: set the command completed on the blockchain, it can now be store in a traject
+    // description: set the command completed on the blockchain, it can now be store in an Itinerary
     // input: _commandID
     // return: 
     function command_completed(string memory ipfsHash) public returns(bool){
@@ -250,160 +250,160 @@ contract Command_preparator{
         return true;
     }
 
-    // new_traject
-    // description: create a new traject
+    // new_Itinerary
+    // description: create a new Itinerary
     // input: N/A
-    // return: the trajectID of the new traject (index of the trajects list)
-    function new_traject() public returns(uint trajectID){
-        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
+    // return: the ItineraryID of the new Itinerary (index of the Itinerarys list)
+    function new_Itinerary() public returns(uint ItineraryID){
+        uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         
-        if(_trajectID < D.numTrajects){   
-            require(D.trajects[_trajectID].loaded == true, "already have an open traject");  
+        if(_ItineraryID < D.numItinerarys){   
+            require(D.Itinerarys[_ItineraryID].loaded == true, "already have an open Itinerary");  
         }
         
-        Traject memory newTraject;
-        newTraject.nbTrailers = 0;
-        newTraject.truckID = 0;
-        newTraject.totWeight = 0;
-        newTraject.totVolume = 0;
-        newTraject.loaded = false;
-        newTraject.done = false;
-        newTraject.co2Emission = 0;
+        Itinerary memory newItinerary;
+        newItinerary.nbTrailers = 0;
+        newItinerary.truckID = 0;
+        newItinerary.totWeight = 0;
+        newItinerary.totVolume = 0;
+        newItinerary.loaded = false;
+        newItinerary.done = false;
+        newItinerary.co2Emission = 0;
 
-        D.trajects.push(newTraject);
-        D.LoadingAttendantOpenTrajectID[msg.sender] = D.numTrajects;
-        D.numTrajects++;
+        D.Itinerarys.push(newItinerary);
+        D.LoadingAttendantOpenItineraryID[msg.sender] = D.numItinerarys;
+        D.numItinerarys++;
 
-        return (D.numTrajects - 1);
+        return (D.numItinerarys - 1);
     }
     
-    function loading_completed(string memory _IpfsTrajectHash) public returns(bool){
-        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
-        require(D.trajects[_trajectID].loaded == false, "traject is already loaded");
-        require(D.trajects[_trajectID].nbTrailers > 0, "a trailer must be assigned to this traject before closing");
-        D.trajects[_trajectID].loaded = true;
-        D.trajects[_trajectID].ipfsTrajectHash = _IpfsTrajectHash;
+    function loading_completed(string memory _IpfsItineraryHash) public returns(bool){
+        uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
+        require(D.Itinerarys[_ItineraryID].loaded == false, "Itinerary is already loaded");
+        require(D.Itinerarys[_ItineraryID].nbTrailers > 0, "a trailer must be assigned to this Itinerary before closing");
+        D.Itinerarys[_ItineraryID].loaded = true;
+        D.Itinerarys[_ItineraryID].ipfsItineraryHash = _IpfsItineraryHash;
     }
     
-    function get_current_trajectID() public view returns(uint){
-        return D.LoadingAttendantOpenTrajectID[msg.sender];
+    function get_current_ItineraryID() public view returns(uint){
+        return D.LoadingAttendantOpenItineraryID[msg.sender];
     }
     
-    // Associate_traject
-    // description: add a command to a traject
-    // input: ID of a command and ID of the traject
+    // Associate_Itinerary
+    // description: add a command to an Itinerary
+    // input: ID of a command and ID of the Itinerary
     // return: 
-     function Associate_Traject(uint _commandID) public returns(bool) {
+     function Associate_Itinerary(uint _commandID) public returns(bool) {
         
         require(_commandID < D.numCommands, "this command does not exist");
         require(D.commands[_commandID].done == true, "this command is not completed");
-        uint size = D.commands[_commandID].size; // index where to add the new trajectID
+        uint size = D.commands[_commandID].size; // index where to add the new ItineraryID
         if(size > 0){
-            // if command was already assigned to a traject
-            uint last_trajectID = D.commands[_commandID].TrajectIDs[size-1];
-            require(D.trajects[last_trajectID].done == true, "a traject not completed is already assigned to that command");
+            // if command was already assigned to an Itinerary
+            uint last_ItineraryID = D.commands[_commandID].ItineraryIDs[size-1];
+            require(D.Itinerarys[last_ItineraryID].done == true, "an Itinerary not completed is already assigned to that command");
         }
         
-        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].loaded == false, "this traject must not be already loaded");
+        uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].loaded == false, "this Itinerary must not be already loaded");
         
         
         
-        D.commands[_commandID].TrajectIDs.push(_trajectID);
+        D.commands[_commandID].ItineraryIDs.push(_ItineraryID);
         D.commands[_commandID].size++;
         
-        D.trajects[_trajectID].totWeight += D.commands[_commandID].totWeight;
-        D.trajects[_trajectID].totVolume += D.commands[_commandID].totVolume;
+        D.Itinerarys[_ItineraryID].totWeight += D.commands[_commandID].totWeight;
+        D.Itinerarys[_ItineraryID].totVolume += D.commands[_commandID].totVolume;
         
         return true;
      }
      
     // associate_trailer
-    // description: add a trailers ID to the trajects (a truck transport multiple trailers)
-    // input: ID of a command and ID of the traject
+    // description: add a trailers ID to the Itinerarys (a truck transport multiple trailers)
+    // input: ID of a command and ID of the Itinerary
     // return:      
     function associate_trailer(uint _trailerID) public returns(bool) {
-        uint _trajectID = D.LoadingAttendantOpenTrajectID[msg.sender];
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].loaded == false, "this traject must not be already loaded");
+        uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].loaded == false, "this Itinerary must not be already loaded");
         
-        D.trajects[_trajectID].TrailerIDs.push(_trailerID);
-        D.trajects[_trajectID].nbTrailers++;
-        D.TrailerCurrentTraject[_trailerID] = _trajectID;
+        D.Itinerarys[_ItineraryID].TrailerIDs.push(_trailerID);
+        D.Itinerarys[_ItineraryID].nbTrailers++;
+        D.TrailerCurrentItinerary[_trailerID] = _ItineraryID;
     }
     
-    function get_traject_info(uint _trajectID) public view returns(uint, uint, uint, bool, bool, bool, string memory){
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
+    function get_Itinerary_info(uint _ItineraryID) public view returns(uint, uint, uint, bool, bool, bool, string memory){
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
 
-        return (D.trajects[_trajectID].totWeight, D.trajects[_trajectID].totVolume, D.trajects[_trajectID].co2Emission, D.trajects[_trajectID].loaded, D.trajects[_trajectID].started, D.trajects[_trajectID].done, D.trajects[_trajectID].ipfsTrajectHash);
+        return (D.Itinerarys[_ItineraryID].totWeight, D.Itinerarys[_ItineraryID].totVolume, D.Itinerarys[_ItineraryID].co2Emission, D.Itinerarys[_ItineraryID].loaded, D.Itinerarys[_ItineraryID].started, D.Itinerarys[_ItineraryID].done, D.Itinerarys[_ItineraryID].ipfsItineraryHash);
     }
     
-    function get_trailer_current_traject(uint _trailerID) public view returns(uint){
-        return D.TrailerCurrentTraject[_trailerID];
+    function get_trailer_current_Itinerary(uint _trailerID) public view returns(uint){
+        return D.TrailerCurrentItinerary[_trailerID];
     }
     
-    function get_trucker_current_trajectID() public view returns(uint){
-        return D.TruckerOpenTrajectID[msg.sender];
+    function get_trucker_current_ItineraryID() public view returns(uint){
+        return D.TruckerOpenItineraryID[msg.sender];
     }
     
-    function grab_traject(uint _trajectID) public returns(bool){
+    function grab_Itinerary(uint _ItineraryID) public returns(bool){
         
         
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
-        require(D.trajects[_trajectID].started == false, "this traject must not be completed");
-        uint _lastTrajectID = D.TruckerOpenTrajectID[msg.sender];
-        if(_lastTrajectID > 0){
-            require(D.trajects[_lastTrajectID].done == true, "trucker must have completed is last traject");
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].loaded == true, "this Itinerary must be loaded");
+        require(D.Itinerarys[_ItineraryID].started == false, "this Itinerary must not be completed");
+        uint _lastItineraryID = D.TruckerOpenItineraryID[msg.sender];
+        if(_lastItineraryID > 0){
+            require(D.Itinerarys[_lastItineraryID].done == true, "trucker must have completed is last Itinerary");
         }
         
         
-        D.TruckerOpenTrajectID[msg.sender] = _trajectID;
+        D.TruckerOpenItineraryID[msg.sender] = _ItineraryID;
     }    
 
-    function traject_start(uint _CO2Counter, uint _truckID) public returns(bool){
-        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].loaded == true, "this traject must be loaded");
-        require(D.trajects[_trajectID].started == false, "this traject must not be started");
+    function Itinerary_start(uint _CO2Counter, uint _truckID) public returns(bool){
+        uint _ItineraryID = D.TruckerOpenItineraryID[msg.sender];
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].loaded == true, "this Itinerary must be loaded");
+        require(D.Itinerarys[_ItineraryID].started == false, "this Itinerary must not be started");
         
-        D.trajects[_trajectID].started = true;
-        D.trajects[_trajectID].truckID = _truckID;
-        D.trajects[_trajectID].co2Emission = _CO2Counter;
+        D.Itinerarys[_ItineraryID].started = true;
+        D.Itinerarys[_ItineraryID].truckID = _truckID;
+        D.Itinerarys[_ItineraryID].co2Emission = _CO2Counter;
         
     }
 
-    function traject_stop(uint _CO2Counter, uint _truckID) public returns(bool){
-        uint _trajectID = D.TruckerOpenTrajectID[msg.sender];
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].started == true, "this traject must be started");
-        require(D.trajects[_trajectID].done == false, "this traject must be started");
-        require(D.trajects[_trajectID].truckID == _truckID, "must be the same truck as traject started");
-        require(D.trajects[_trajectID].co2Emission < _CO2Counter, "CO2 emission of a traject cant be negative");
+    function Itinerary_stop(uint _CO2Counter, uint _truckID) public returns(bool){
+        uint _ItineraryID = D.TruckerOpenItineraryID[msg.sender];
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].started == true, "this Itinerary must be started");
+        require(D.Itinerarys[_ItineraryID].done == false, "this Itinerary must be started");
+        require(D.Itinerarys[_ItineraryID].truckID == _truckID, "must be the same truck as Itinerary started");
+        require(D.Itinerarys[_ItineraryID].co2Emission < _CO2Counter, "CO2 emission of an Itinerary cant be negative");
         
-        D.trajects[_trajectID].done = true;
-        D.trajects[_trajectID].co2Emission = _CO2Counter - D.trajects[_trajectID].co2Emission;
+        D.Itinerarys[_ItineraryID].done = true;
+        D.Itinerarys[_ItineraryID].co2Emission = _CO2Counter - D.Itinerarys[_ItineraryID].co2Emission;
     }
     
-    function get_traject_emission(uint _trajectID) public view returns (uint){
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
-        require(D.trajects[_trajectID].done == true, "this is not completed");
+    function get_Itinerary_emission(uint _ItineraryID) public view returns (uint){
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
+        require(D.Itinerarys[_ItineraryID].done == true, "this is not completed");
         
-        return D.trajects[_trajectID].co2Emission;
+        return D.Itinerarys[_ItineraryID].co2Emission;
     }
     
-    function get_product_emission(string memory _upc, uint _trajectID) public view returns (uint){
-        require(_trajectID < D.numTrajects, 'this traject does not exist');
+    function get_product_emission(string memory _upc, uint _ItineraryID) public view returns (uint){
+        require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
-        require(D.trajects[_trajectID].done == true, "this is not completed");
+        require(D.Itinerarys[_ItineraryID].done == true, "this is not completed");
         
-        uint merchandiseWeight = D.trajects[_trajectID].totWeight;
-        uint merchandiseVolume = D.trajects[_trajectID].totVolume;
+        uint merchandiseWeight = D.Itinerarys[_ItineraryID].totWeight;
+        uint merchandiseVolume = D.Itinerarys[_ItineraryID].totVolume;
         uint productWeight = D.upcs[D.UpcToIndex[_upc].ID].Weight;
         uint productVolume = D.upcs[D.UpcToIndex[_upc].ID].Volume;
         
         
-        return (D.trajects[_trajectID].co2Emission*(productWeight*merchandiseVolume + productVolume*merchandiseWeight) / (2*merchandiseWeight*merchandiseVolume));
+        return (D.Itinerarys[_ItineraryID].co2Emission*(productWeight*merchandiseVolume + productVolume*merchandiseWeight) / (2*merchandiseWeight*merchandiseVolume));
     }
 }
