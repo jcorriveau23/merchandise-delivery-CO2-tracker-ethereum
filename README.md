@@ -13,20 +13,16 @@ The goal is to internalize itineraries emissions on products.
 <img src="README_picture/HOME.jpg" alt="HOME" width="300"/>
 
 ## Order Picker APP
-
-![Alt text](README_picture/Order_Picker_APP.jpg?raw=true)
+<img src="README_picture/Order_Picker_APP.jpg" alt="Order_Picker_APP" width="300"/>
 
 ## Loading Attendant APP
-
-![Alt text](README_picture/Loading_attendant_APP.jpg?raw=true)
+<img src="README_picture/Loading_attendant_APP.jpg" alt="Loading_attendant_APP" width="300"/>
 
 ## Trucker APP
-
-![Alt text](README_picture/Trucker_APP.jpg?raw=true)
+<img src="README_picture/Trucker_APP.jpg" alt="Trucker_APP" width="300"/>
 
 ## Product Info APP
-
-![Alt text](README_picture/Product_info.jpg?raw=true)
+<img src="README_picture/Product_info.jpg" alt="Product_info" width="300"/>
 
 
 
