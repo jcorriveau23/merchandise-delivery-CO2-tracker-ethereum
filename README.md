@@ -9,7 +9,7 @@ The goal is to internalize itineraries emissions on products.
 ![Alt text](README_picture/System_structure.jpg?raw=true)
 
 ## Contract Structure:
-![Alt text](README_picture/Contract structure.png?raw=true)
+![Alt text](README_picture/Contract structure.png)
 
 # Application pages
 ## Home
