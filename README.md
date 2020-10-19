@@ -7,10 +7,10 @@ The goal is to internalize itineraries emissions on products.
 
 ![Alt text](README_picture/System_structure.jpg?raw=true)
 
-# APP
+# Application pages
 
 ## Home
-![Alt text](README_picture/HOME.jpg?raw=true)
+![Alt text](README_picture/HOME.jpg?raw=true =100x20)
 
 ## Order Picker APP
 
