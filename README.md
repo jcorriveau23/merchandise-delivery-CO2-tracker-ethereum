@@ -10,8 +10,7 @@ The goal is to internalize itineraries emissions on products.
 # Application pages
 
 ## Home
-![Alt text](README_picture/HOME.jpg)
-<img src="README_picture/HOME.jpg" alt="HOME" width="100"/>
+<img src="README_picture/HOME.jpg" alt="HOME" width="300"/>
 
 ## Order Picker APP
 
