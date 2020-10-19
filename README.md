@@ -3,12 +3,15 @@
 Proof of concept of DAPP on Ethereum that track carbon footprint of merchandise transportation.
 The goal is to internalize itineraries emissions on products.
 
+
 ## Structure of the system:
 
 ![Alt text](README_picture/System_structure.jpg?raw=true)
 
-# Application pages
+## Contract Structure:
+![Alt text](README_picture/Contract structure.jpg?raw=true)
 
+# Application pages
 ## Home
 <img src="README_picture/HOME.jpg" alt="HOME" width="300"/>
 
