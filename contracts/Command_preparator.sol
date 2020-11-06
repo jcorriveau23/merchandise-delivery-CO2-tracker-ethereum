@@ -204,6 +204,29 @@ contract Command_preparator{
 
         return (D.commands[_commandID].totWeight, D.commands[_commandID].totVolume, D.commands[_commandID].done, D.commands[_commandID].ipfsCommandHash);
     }
+
+     // get_command_info
+    // description: return the info of a command
+    // input: _commandID
+    // return: total weight of the command, total volume of the command and if the command is done or not
+    function get_current_command_id() public view returns(uint){
+
+        return D.openCommandID[msg.sender];
+    }
+
+    // command_completed
+    // description: set the command completed on the blockchain, it can now be store in an Itinerary
+    // input: _commandID
+    // return: 
+    function command_completed(string memory ipfsHash) public returns(bool){
+
+        uint _commandID = D.openCommandID[msg.sender];
+        require(D.commands[_commandID].done == false, 'this command is already done');
+
+        D.commands[_commandID].done = true;
+        D.commands[_commandID].ipfsCommandHash = ipfsHash;
+        return true;
+    }
     
     // get_command_Itinerary_list_size
     // description: return the number of Itinerary this command has take part of
@@ -226,29 +249,7 @@ contract Command_preparator{
         return D.commands[_commandID].ItineraryIDs[_index];
     }
     
-    // get_command_info
-    // description: return the info of a command
-    // input: _commandID
-    // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_current_command_id() public view returns(uint){
-
-        return D.openCommandID[msg.sender];
-    }
-
-    // command_completed
-    // description: set the command completed on the blockchain, it can now be store in an Itinerary
-    // input: _commandID
-    // return: 
-    function command_completed(string memory ipfsHash) public returns(bool){
-
-        uint _commandID = D.openCommandID[msg.sender];
-        require(D.commands[_commandID].done == false, 'this command is already done');
-
-        //D.openCommandID[msg.sender] = 0;
-        D.commands[_commandID].done = true;
-        D.commands[_commandID].ipfsCommandHash = ipfsHash;
-        return true;
-    }
+   
 
     // new_Itinerary
     // description: create a new Itinerary
@@ -267,6 +268,7 @@ contract Command_preparator{
         newItinerary.totWeight = 0;
         newItinerary.totVolume = 0;
         newItinerary.loaded = false;
+        newItinerary.started = false;
         newItinerary.done = false;
         newItinerary.co2Emission = 0;
 
@@ -276,17 +278,20 @@ contract Command_preparator{
 
         return (D.numItinerarys - 1);
     }
-    
+
+    function get_current_ItineraryID() public view returns(uint){
+        return D.LoadingAttendantOpenItineraryID[msg.sender];
+    }
+
     function loading_completed(string memory _IpfsItineraryHash) public returns(bool){
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         require(D.Itinerarys[_ItineraryID].loaded == false, "Itinerary is already loaded");
-        require(D.Itinerarys[_ItineraryID].nbTrailers > 0, "a trailer must be assigned to this Itinerary before closing");
+        if(D.Itinerarys[_ItineraryID].totWeight != 0){
+            require(D.Itinerarys[_ItineraryID].nbTrailers > 0, "a trailer must be assigned to this Itinerary before closing");
+        }
+        
         D.Itinerarys[_ItineraryID].loaded = true;
         D.Itinerarys[_ItineraryID].ipfsItineraryHash = _IpfsItineraryHash;
-    }
-    
-    function get_current_ItineraryID() public view returns(uint){
-        return D.LoadingAttendantOpenItineraryID[msg.sender];
     }
     
     // Associate_Itinerary
@@ -358,7 +363,6 @@ contract Command_preparator{
             require(D.Itinerarys[_lastItineraryID].done == true, "trucker must have completed is last Itinerary");
         }
         
-        
         D.TruckerOpenItineraryID[msg.sender] = _ItineraryID;
     }    
 
@@ -378,7 +382,7 @@ contract Command_preparator{
         uint _ItineraryID = D.TruckerOpenItineraryID[msg.sender];
         require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
         require(D.Itinerarys[_ItineraryID].started == true, "this Itinerary must be started");
-        require(D.Itinerarys[_ItineraryID].done == false, "this Itinerary must be started");
+        require(D.Itinerarys[_ItineraryID].done == false, "this must not already be completed");
         require(D.Itinerarys[_ItineraryID].truckID == _truckID, "must be the same truck as Itinerary started");
         require(D.Itinerarys[_ItineraryID].co2Emission <= _CO2Counter, "CO2 emission of an Itinerary cant be negative");
         
