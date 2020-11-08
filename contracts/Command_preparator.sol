@@ -286,9 +286,8 @@ contract Command_preparator{
     function loading_completed(string memory _IpfsItineraryHash) public returns(bool){
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         require(D.Itinerarys[_ItineraryID].loaded == false, "Itinerary is already loaded");
-        if(D.Itinerarys[_ItineraryID].totWeight != 0){
-            require(D.Itinerarys[_ItineraryID].nbTrailers > 0, "a trailer must be assigned to this Itinerary before closing");
-        }
+        require(D.Itinerarys[_ItineraryID].nbTrailers > 0, "a trailer must be assigned to this Itinerary before closing");
+
         
         D.Itinerarys[_ItineraryID].loaded = true;
         D.Itinerarys[_ItineraryID].ipfsItineraryHash = _IpfsItineraryHash;

@@ -18,7 +18,7 @@ contract('Command_preparator', () => {
 	// New_product(upc, weight, volume)
 	// fill the mappings between upc and (weight + volume) to create a database
 	// an upc can only be registered once
-	it('Should add the product', async () => {
+	it('A product weight and volume can be registered', async () => {
 		const command_preparator = await Command_preparator.deployed();
 		await command_preparator.New_product("10000000000001", 3, 2);
 
@@ -27,7 +27,7 @@ contract('Command_preparator', () => {
 		let volume = await command_preparator.get_upc_Volume.call("10000000000001");
 		assert.equal(volume, 2, "the volume has been registered correctly");
 	});
-	it('Cant add a duplicate UPC to the chain', async () => {
+	it('Cant registered a duplicate UPC to the chain', async () => {
 		const command_preparator = await Command_preparator.deployed();
 		try {
 			await command_preparator.New_product("10000000000001", 3, 2);
@@ -44,30 +44,58 @@ contract('Command_preparator', () => {
 	// Test 3 - Associate_command function
 	// Associate_command(upc, unique)
 	// association an open command to a product
+
+	
+	it("a command can be initiated by a loading attendant", async () => {
+		const command_preparator = await Command_preparator.deployed();
+		orderID = -1;
+
+		await command_preparator.new_command();
+		var orderID = await command_preparator.get_current_command_id();
+		console.log('order created ID: ' + orderID) // print the error
+		assert.equal(orderID, 0, "could not initiate the first command of the contract")
+	});
+
+	
+	it("can't open 2 itinerary at the same time", async () => {
+		const command_preparator = await Command_preparator.deployed();
+		try{
+			await command_preparator.new_command();
+		}
+		catch(e){
+			console.log('error: ' + e.reason) // print the error
+			assert.equal(e.reason, "already have an open command", "user cant open a new order if already have one not close");
+		}
+		
+	});
+
 	it('Cant add a command to a not registered product', async () => {
 		const command_preparator = await Command_preparator.deployed();
 		try {
 			
-			await command_preparator.new_command();
 			await command_preparator.Associate_Command("30000000000003", 3);  // the product was not registered an error should occur on the console
 		}
 		catch(e){
 			console.log('error: ' + e.reason) // print the error
 			assert.equal(e.reason, "must be a product registered", "added a command to a product not registered...");
 		}
+		await command_preparator.command_completed("ipfs link in string");
 	});
 
 	it('A command can be add to a registered product', async () => {
 		const command_preparator = await Command_preparator.deployed();
-		await command_preparator.command_completed("ipfs link in string");
+		
 		caca = await command_preparator.new_command();
 
 		await command_preparator.New_product("300000000000033", 3, 2);		// register product weight and volume
 		await command_preparator.Associate_Command("300000000000033", 1);	// associate a traject to a specific product
+		await command_preparator.command_completed("ipfs link in string");
 
 		let commandID = await command_preparator.get_product_commandID.call("300000000000033", 1, 0);
 		console.log('command ID added: ' + commandID);
 		assert.equal(commandID, 1, "commandID was not set correctly");
+
+		
 	});
 
 	it('multiple commands can be assign to a registered product', async () => {
@@ -75,24 +103,27 @@ contract('Command_preparator', () => {
 		await command_preparator.New_product("3000000000000333", 3, 2);		// register product weight and volume
 
 		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
-			await command_preparator.command_completed("ipfs link in string");
+			
 			await command_preparator.new_command();
 			await command_preparator.Associate_Command("3000000000000333", 1);
+			await command_preparator.command_completed("ipfs link in string");
+
 			let command = await command_preparator.get_product_commandID.call("3000000000000333", 1, i); // index i of commandIDs list
 			console.log('added: ' + i +' => ' + command);
 		}
 
 		let command = await command_preparator.get_product_commandID.call("3000000000000333", 1, 2);  // index 2 of traject list
-		assert.equal(command, 4, "command was not set correctly");  // index 2 trajecst ID must equal to 2 in this case
+		assert.equal(command, 4, "command was not set correctly");  // index 2 trajecst ID must equal to 4 in this case
 	});
 
-	it('revert when trying to view a commandID with index greater than commandIDs list', async () => {
+	it('revert when trying to view a commandID with index greater than commandIDs list size', async () => {
 		const command_preparator = await Command_preparator.deployed();
 		await command_preparator.New_product("30000000000003333", 3, 2);		// register product weight and volume
-		await command_preparator.command_completed("ipfs link in string");
+		
 		await command_preparator.new_command();
 		
 		await command_preparator.Associate_Command("30000000000003333", 3);
+		await command_preparator.command_completed("ipfs link in string");
 
 		try{
 			await command_preparator.get_product_commandID.call('30000000000003333', 3, 4)  // should be reverted 
@@ -108,9 +139,10 @@ contract('Command_preparator', () => {
 		await command_preparator.New_product("3000000000033333", 3, 2);		// register product weight and volume
 
 		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
-			await command_preparator.command_completed("ipfs link in string");
+			
 			await command_preparator.new_command();
 			await command_preparator.Associate_Command("3000000000033333", 1);
+			await command_preparator.command_completed("ipfs link in string");
 			let command = await command_preparator.get_product_commandID.call("3000000000033333", 1, i); // index i of commandIDs list
 			console.log('added: ' + i +' => ' + command);
 		}
@@ -123,9 +155,10 @@ contract('Command_preparator', () => {
 		const command_preparator = await Command_preparator.deployed();
 
 
+
 		currentCommand = await command_preparator.get_current_command_id();
 		console.log("current order: " + currentCommand)
-		await command_preparator.command_completed("ipfs link in string");
+		
 		let info = await command_preparator.get_command_info(currentCommand);
 
 		console.log("order ID: " + currentCommand)
@@ -162,19 +195,21 @@ contract('Command_preparator', () => {
 			console.log('error: ' + e.reason) // print the error
 			assert.equal(e.reason, "already have an open Itinerary", "user cant open a new Itinerary if already have one not close");
 		}
+		
 	});
 
-	it("can close an open itinery without associating a trailer only if it has no order inside", async () => {
+	it("cant close an open itinerary without associating a trailer to it", async () => {
 		const command_preparator = await Command_preparator.deployed();
 
-		await command_preparator.loading_completed("ipfs link in string");
-		
-		itineraryID = await command_preparator.get_current_ItineraryID()
-		itineraryInfo = await command_preparator.get_Itinerary_info(itineraryID);
-
-		console.log("itinerary done: " + itineraryInfo[3])
-		assert.equal(itineraryInfo[3], true, "could mark as the itinerary loading completed")
-		assert.equal(itineraryInfo[6], "ipfs link in string", "could not store the ipfs link")
+		try{
+			await command_preparator.loading_completed("ipfs link in string"); // close itinerary as loading attendant
+		}
+		catch(e){
+			console.log('error: ' + e.reason) // print the error
+			assert.equal(e.reason, "a trailer must be assigned to this Itinerary before closing", "user cannot close an itinerary without associatin a trailer/container to it");	
+		}
+		await command_preparator.associate_trailer(666);					// add trailer to traject
+		await command_preparator.loading_completed("ipfs link in string"); // close itinerary as loading attendant
 	});
 
 	it("can add orders to itinerary", async () => {
