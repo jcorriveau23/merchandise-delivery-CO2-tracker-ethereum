@@ -31,10 +31,10 @@ export default class Info extends Component {
         <View>
           <Button
             color={'green'}
-            title={"Command Info"}
+            title={"Order Info"}
             onPress={() => this.props.navigation.navigate("ProductInfo")}
           />
-          <Text style={styles.textTodo}> To do: Get info from a command ID</Text>
+          <Text style={styles.textTodo}> To do: Get info from a Order ID</Text>
         </View>
         <Separator />
         <View>

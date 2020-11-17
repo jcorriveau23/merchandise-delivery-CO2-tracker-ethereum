@@ -54,8 +54,6 @@ export default class Trucker extends Component {
 		if (added == true) {
 
 		}
-
-
 	}
 
 	async get_Itinerary_info(ItineraryID) {
@@ -65,7 +63,7 @@ export default class Trucker extends Component {
 			console.log(ItineraryInfo);
 		}
 		catch (e) {
-			//Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
+			//Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + ItineraryID);
 		}
 	}
 

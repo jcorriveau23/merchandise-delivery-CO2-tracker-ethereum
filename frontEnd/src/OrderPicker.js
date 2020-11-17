@@ -36,7 +36,7 @@ export default class OrderPicker extends Component {
 			orderInfo: "",
 			IpfsURL: "",
 
-			commandID: 0,
+			orderID: 0,
 			totalWeight: 0,
 			totalVolume: 0,
 			done: false
@@ -51,7 +51,7 @@ export default class OrderPicker extends Component {
 		this.setState({ QrcodeScan: qrCode.UPC });
 		this.setState({ function: functions });
 
-		if (functions == "Associate_command") {
+		if (functions == "Associate_order_to_unique_product") {
 
 			var currentOrder = [];
 			var currentOrderString = "";
@@ -61,14 +61,14 @@ export default class OrderPicker extends Component {
 			if (added == true) {
 				// async storage the new items	
 				var order = await AsyncStorage.getItem('order');
-				await this.get_command_info(this.state.commandID, false);
+				await this.get_order_info(this.state.orderID, false);
 
 				if (order == null) {
 					// no order stored first product
 
 					currentOrder.push(qrCode);
 					var jsonOrder = {
-						"orderID": this.state.commandID,
+						"orderID": this.state.orderID,
 						"productList": currentOrder
 					};
 					currentOrderString = JSON.stringify(jsonOrder);
@@ -90,17 +90,17 @@ export default class OrderPicker extends Component {
 	}
 
 	async componentDidMount() {
-		var commandID = await contract.methods.get_current_command_id().call();
-		await this.get_command_info(commandID, false);
+		var orderID = await contract.methods.get_current_order_id().call();
+		await this.get_order_info(orderID, false);
 		//this.setState({orderInfo: orderInfo});
-		this.setState({ commandID: commandID });
+		this.setState({ orderID: orderID });
 
 
 	}
 
-	async init_command() {
+	async init_order() {
 
-		const data = contract.methods.new_command().encodeABI();
+		const data = contract.methods.init_order().encodeABI();
 		const nonce = await web3.eth.getTransactionCount(publicKey);
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
@@ -115,20 +115,20 @@ export default class OrderPicker extends Component {
 		try {
 			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-			var newcommandID = await contract.methods.get_current_command_id().call();
-			this.setState({ commandID: newcommandID });
+			var neworderID = await contract.methods.get_current_order_id().call();
+			this.setState({ orderID: neworderID });
 			this.setState({ IpfsURL: "" })
-			await this.get_command_info(newcommandID, false);
+			await this.get_order_info(neworderID, false);
 
-			Alert.alert('Order created', 'Order ID: ' + this.state.commandID);
+			Alert.alert('Order created', 'Order ID: ' + this.state.orderID);
 		} catch (error) {
-			if (error.toString().includes("already have an open command")) {
-				Alert.alert('Error: user already have an open order', 'open orderID: ' + this.state.commandID);
+			if (error.toString().includes("already have an open order")) {
+				Alert.alert('Error: user already have an open order', 'open orderID: ' + this.state.orderID);
 			}
 		}
 	}
 
-	async close_command() {
+	async close_order() {
 
 		try {
 			var order = await AsyncStorage.getItem('order');
@@ -145,16 +145,16 @@ export default class OrderPicker extends Component {
 		catch (error) {
 			console.log(error);
 			if (error.toString().includes("null is not an object")) {
-				Alert.alert('Error: nothing in order', 'wont store order in IPFS\norderID: ' + this.state.commandID);
+				Alert.alert('Error: nothing in order', 'wont store order in IPFS\norderID: ' + this.state.orderID);
 				var hash = 0; //
 			}
 			else {
-				Alert.alert('Error: IPFS Storing did not work', 'orderID: ' + this.state.commandID);
+				Alert.alert('Error: IPFS Storing did not work', 'orderID: ' + this.state.orderID);
 				return -1;
 			}
 		}
 
-		const data = contract.methods.command_completed(hash).encodeABI();  // send (32 + 2) bytes ipfs hash
+		const data = contract.methods.close_order(hash).encodeABI();  // send (32 + 2) bytes ipfs hash
 		const nonce = await web3.eth.getTransactionCount(publicKey);
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
@@ -168,31 +168,31 @@ export default class OrderPicker extends Component {
 		);
 		try {
 			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-			await this.get_command_info(this.state.commandID, false);
+			await this.get_order_info(this.state.orderID, false);
 
-			Alert.alert('Order closed', 'Order ID: ' + this.state.commandID + '\n' + 'IPFS hash: ' + IpfsURL);
+			Alert.alert('Order closed', 'Order ID: ' + this.state.orderID + '\n' + 'IPFS hash: ' + IpfsURL);
 			this.setState({ IpfsURL: IpfsURL })
 			AsyncStorage.removeItem("order");
 
 		} catch (error) {
 			if (error.toString().includes("user has no open order")) {
-				Alert.alert('Error: user has no open order', 'close orderID: ' + this.state.commandID);
+				Alert.alert('Error: user has no open order', 'close orderID: ' + this.state.orderID);
 			}
 		}
 	}
 
-	async get_command_info(commandID, alert) {
-		console.log('get_command_info');
+	async get_order_info(orderID, alert) {
+		console.log('get_order_info');
 		try {
-			var orderInfo = await contract.methods.get_command_info(commandID).call();
+			var orderInfo = await contract.methods.get_order_info(orderID).call();
 			this.setState({ orderInfo: orderInfo });
 			if (alert == true) {
-				Alert.alert('Command info', 'Command ID: ' + commandID + '\nTotal weight: ' + orderInfo['0'] + '\nTotal volume: ' + orderInfo['1'] + '\nDone: ' + orderInfo['2']);
+				Alert.alert('Order info', 'Order ID: ' + orderID + '\nTotal weight: ' + orderInfo['0'] + '\nTotal volume: ' + orderInfo['1'] + '\nDone: ' + orderInfo['2']);
 			}
 			return orderInfo;
 		}
 		catch (e) {
-			//Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + commandID);
+			//Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + orderID);
 		}
 	}
 	render() {
@@ -215,7 +215,7 @@ export default class OrderPicker extends Component {
 						title={"Register Product"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
 							data: "Register",
-							commandID: 0
+							orderID: 0
 						})}
 					/>
 					<Text style={styles.text}>Register the Weight and Volume of a product (UPC code) on the chain.</Text>
@@ -225,13 +225,13 @@ export default class OrderPicker extends Component {
 					<Button
 						color={'green'}
 						title={"start order"}
-						onPress={() => this.init_command()}
+						onPress={() => this.init_order()}
 					/>
 					<Text style={styles.text}>initiate an order.</Text>
 				</View>
 				<Separator />
 				<View>
-					<Text style={styles.textTitle}>Your current Order ID : {this.state.commandID}</Text>
+					<Text style={styles.textTitle}>Your current Order ID : {this.state.orderID}</Text>
 					<Text style={styles.textCenter}>Total weight: {this.state.orderInfo['0']}</Text>
 					<Text style={styles.textCenter}>Total volume: {this.state.orderInfo['1']}</Text>
 
@@ -247,8 +247,8 @@ export default class OrderPicker extends Component {
 						color={'green'}
 						title={"add product to order"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "Associate_command",
-							commandID: this.state.commandID
+							data: "Associate_order_to_unique_product",
+							orderID: this.state.orderID
 						})}
 					/>
 					<Text style={styles.text}>Scan a product, to link it to your current order ID</Text>
@@ -259,7 +259,7 @@ export default class OrderPicker extends Component {
 					<Button
 						color={'#e00000'}
 						title={"close order"}
-						onPress={() => this.close_command()}
+						onPress={() => this.close_order()}
 					/>
 					<Text style={styles.text}>close your order and store its content on IPFS</Text>
 				</View>

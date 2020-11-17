@@ -24,16 +24,16 @@ export default class QRCodeScannerScreen extends Component {
 constructor(props){
     super(props);
     this.state = {function: "",
-				  commandID: 0,
+				  orderID: 0,
 				  ItineraryID: 0};
 }
 
 componentDidMount(){
     const qrCodeType = this.props.navigation.getParam("data", "No data read");
-	const commandID = this.props.navigation.getParam("commandID", "No data read");
+	const orderID = this.props.navigation.getParam("orderID", "No data read");
 	const ItineraryID = this.props.navigation.getParam("ItineraryID", "No data read");
     this.setState({function: qrCodeType,
-					commandID: commandID,
+					orderID: orderID,
 					ItineraryID: ItineraryID});
 }
 onRead = async e => {
@@ -41,7 +41,7 @@ onRead = async e => {
     // 1: Register product (order Picker)
     if(this.state.function == "Register"){
       console.log("SUCCESS: function: "+ this.state.function);
-      await this.new_product(QrCodeJson.UPC, QrCodeJson.Weight, QrCodeJson.Volume);
+      await this.register_product(QrCodeJson.UPC, QrCodeJson.Weight, QrCodeJson.Volume);
     }
     // 2: Get product info (order Picker)
     else if(this.state.function == "get info"){
@@ -49,24 +49,24 @@ onRead = async e => {
       await this.Get_product_Volume(QrCodeJson.UPC);
     }
     // 3: Associate Order (order Picker)
-    else if(this.state.function == "Associate_command"){
+    else if(this.state.function == "Associate_order_to_unique_product"){
       console.log("SUCCESS: function: "+ this.state.function);
-      var added = await this.associate_command(QrCodeJson.UPC, QrCodeJson.Unique, this.state.commandID);
+      var added = await this.Associate_order_to_unique_product(QrCodeJson.UPC, QrCodeJson.Unique);
 	}
 	// 4: get product order list (order Picker)
-	else if(this.state.function == "get_product_command_list"){
+	else if(this.state.function == "get_product_order_list"){
 		console.log("SUCCESS: function: "+ this.state.function);
-		var added = await this.Get_product_command(QrCodeJson.UPC, QrCodeJson.Unique);
+		var added = await this.Get_product_order(QrCodeJson.UPC, QrCodeJson.Unique);
 	}
 	// 5: associate Itinerary (loading attendant)
-	else if(this.state.function == "associate_Itinerary"){
+	else if(this.state.function == "Associate_itinerary_to_order"){
 		console.log("SUCCESS: function: "+ this.state.function);
-		var added = await this.associate_Itinerary(QrCodeJson.UPC, QrCodeJson.Unique);
+		var added = await this.Associate_itinerary_to_order(QrCodeJson.UPC, QrCodeJson.Unique);
 	}
 	// 6: associate trailer (loading attendant)
-	else if(this.state.function == "associate_trailer"){
+	else if(this.state.function == "Associate_trailer_to_itinerary"){
 		console.log("SUCCESS: function: "+ this.state.function);
-		var added = await this.associate_trailer(QrCodeJson.trailerID);
+		var added = await this.Associate_trailer_to_itinerary(QrCodeJson.trailerID);
 	}
 	// 7: associate trailer (Trucker)
 	else if(this.state.function == "grab_Itinerary"){
@@ -91,9 +91,9 @@ onRead = async e => {
       console.log("ERROR: function: "+ this.state.function + ", no corresponding QR code function!");
 	}
 
-	if(this.state.function == "associate_Itinerary" || this.state.function == "associate_trailer"){
+	if(this.state.function == "Associate_itinerary_to_order" || this.state.function == "Associate_trailer_to_itinerary"){
 		await this.props.navigation.navigate("LoadingAttendant", {
-			data: this.state.commandID,
+			data: this.state.orderID,
 			function: this.state.function,
 			trailerID: QrCodeJson,
 			added: added
@@ -119,9 +119,9 @@ onRead = async e => {
 	})
 	}
 }
-async new_product(UPC, Weight, Volume) {
+async register_product(UPC, Weight, Volume) {
 
-	const data = contract.methods.New_product(UPC, Weight, Volume).encodeABI();
+	const data = contract.methods.register_product(UPC, Weight, Volume).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
@@ -143,9 +143,9 @@ async new_product(UPC, Weight, Volume) {
 		} 
 	}
 }
-async associate_command(UPC, UniquenessID) {
+async Associate_order_to_unique_product(UPC, UniquenessID) {
 
-	const data = contract.methods.Associate_Command(UPC, UniquenessID).encodeABI();
+	const data = contract.methods.Associate_order_to_unique_product(UPC, UniquenessID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
@@ -159,15 +159,15 @@ async associate_command(UPC, UniquenessID) {
 	);
 	try{
 		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Command assigned to this product!','UPC: ' + UPC + '\nUnique ID: ' + UniquenessID + '\nCommand ID: ' + this.state.commandID,);
+		Alert.alert('Order assigned to this product!','UPC: ' + UPC + '\nUnique ID: ' + UniquenessID + '\nOrder ID: ' + this.state.orderID,);
 		return true;
 
 	}catch(error){
-		if(error.toString().includes("command must not be completed")){
-			Alert.alert('Error: command must not be completed','Itinerary ID: ' + this.state.commandID);
+		if(error.toString().includes("order must not be completed")){
+			Alert.alert('Error: order must not be completed','Itinerary ID: ' + this.state.orderID);
 		}
-		else if(error.toString().includes("a command not completed is already assigned to this product")){
-			Alert.alert('Error: Order already associated to that product','Command ID: ' + this.state.commandID);
+		else if(error.toString().includes("an order not completed is already assigned to this product")){
+			Alert.alert('Error: Order already associated to that product','Order ID: ' + this.state.orderID);
 		}
 		else if(error.toString().includes("must be a product registered")){
 			Alert.alert('Error: product not registered','UPC: ' + UPC);
@@ -175,16 +175,16 @@ async associate_command(UPC, UniquenessID) {
 		return false;
 	}
 }
-async associate_Itinerary(UPC, UniquenessID){
+async Associate_itinerary_to_order(UPC, UniquenessID){
 	try {
-		var lenght = await contract.methods.get_product_commands_size(UPC, UniquenessID).call();
-		var commandID = await contract.methods.get_product_commandID(UPC, UniquenessID, lenght-1).call(); // get the last commandID associated to that Itinerary
-		this.setState({commandID: commandID});
+		var lenght = await contract.methods.get_product_orders_size(UPC, UniquenessID).call();
+		var orderID = await contract.methods.get_product_orderID(UPC, UniquenessID, lenght-1).call(); // get the last orderID associated to that Itinerary
+		this.setState({orderID: orderID});
 	}catch(error){
-		Alert.alert('this product was not assign to a command yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);	
+		Alert.alert('this product was not assign to a order yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);	
 	}
 
-	const data = contract.methods.Associate_Itinerary(commandID).encodeABI();
+	const data = contract.methods.Associate_itinerary_to_order(orderID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
@@ -198,18 +198,18 @@ async associate_Itinerary(UPC, UniquenessID){
 	);
 	try{
 		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Itinerary assign to that command','command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
+		Alert.alert('Itinerary assign to that order','order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
 		return true;
 		
 	}catch(error){
 		console.log(error);
-		Alert.alert('something went wrong', 'command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
+		Alert.alert('something went wrong', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
 	}
 	return false;
 }
-async associate_trailer(trailerID){
+async Associate_trailer_to_itinerary(trailerID){
 
-	const data = contract.methods.associate_trailer(trailerID).encodeABI();
+	const data = contract.methods.Associate_trailer_to_itinerary(trailerID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
@@ -322,28 +322,28 @@ async Get_product_Volume(UPC) {
   console.log(weight);
   Alert.alert('Product Info', 'Product UPC: ' + UPC + '\nWeight registered: ' + weight + '\nVolume registered: ' + volume);
 }
-async Get_product_command(UPC, unique) {
+async Get_product_order(UPC, unique) {
   try {
-    var lenght = await contract.methods.get_product_commands_size(UPC, unique).call();
+    var lenght = await contract.methods.get_product_orders_size(UPC, unique).call();
     console.log(lenght);
   }
   catch(e){
-    Alert.alert('No command registered yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + unique);
+    Alert.alert('No order registered yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + unique);
   }
 
-  var command_list = [];
+  var order_list = [];
   var i = 0;
   for (i=0; i < lenght; i++){
     try {
-      var result = await contract.methods.get_product_commandID(UPC, unique, i).call();
-      command_list.push(result);
+      var result = await contract.methods.get_product_orderID(UPC, unique, i).call();
+      order_list.push(result);
       
     }
     catch(e){
       Alert.alert('something went wrong', 'Product UPC: ' + UPC + '\nUnique ID: ' + unique);
     }
   }
-  Alert.alert('command ID request', 'Product UPC: ' + UPC + '\nProduct uniqueID: ' + unique + '\nItinerarys ID list: ' + command_list);
+  Alert.alert('order ID request', 'Product UPC: ' + UPC + '\nProduct uniqueID: ' + unique + '\nItinerarys ID list: ' + order_list);
 }
 
   render() {

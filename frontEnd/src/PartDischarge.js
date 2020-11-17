@@ -49,7 +49,7 @@ export default class PartDischarge extends Component {
 
             ItineraryID: 0,
             trailerIds: [],
-            commandList: []
+            orderList: []
         };
     }
 
@@ -64,7 +64,7 @@ export default class PartDischarge extends Component {
         this.setState({
             ItineraryID: ItineraryContentJson.ItineraryID,
             trailerIds: ItineraryContentJson['trailerIDs'],
-            commandList: ItineraryContentJson['commandList'],
+            orderList: ItineraryContentJson['orderList'],
         });
     }
 
@@ -76,7 +76,7 @@ export default class PartDischarge extends Component {
             return ItineraryInfo;
         }
         catch (e) {
-            Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
+            Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + ItineraryID);
         }
     }
     async ipfsRead(hash) {
@@ -91,9 +91,9 @@ export default class PartDischarge extends Component {
     }
 
     async dischargeOrder(index) {
-        var newCommandList = this.state.commandList;
-        newCommandList.splice(index, 1);
-        this.setState({ commandList: newCommandList })
+        var newOrderList = this.state.orderList;
+        newOrderList.splice(index, 1);
+        this.setState({ orderList: newOrderList })
     }
     async dischargeTrailer(index) {
         var newTrailerList = this.state.trailerIds;
@@ -102,7 +102,7 @@ export default class PartDischarge extends Component {
     }
     async init_Itinerary() {
 
-        const data = contract.methods.new_Itinerary().encodeABI();
+        const data = contract.methods.init_itinerary().encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
         const signedTx = await web3.eth.accounts.signTransaction(
             {
@@ -128,9 +128,9 @@ export default class PartDischarge extends Component {
             return false;
         }
     }
-    async associate_Itinerary(commandID) {
+    async associate_Itinerary(orderID) {
 
-        const data = contract.methods.Associate_Itinerary(commandID).encodeABI();
+        const data = contract.methods.Associate_itinerary_to_order(orderID).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
         const signedTx = await web3.eth.accounts.signTransaction(
             {
@@ -144,19 +144,19 @@ export default class PartDischarge extends Component {
         );
         try {
             await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            Alert.alert('Itinerary assign to that command', 'command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
+            Alert.alert('Itinerary assign to that order', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
             return true;
 
         } catch (error) {
             console.log(error);
-            Alert.alert('something went wrong', 'command ID: ' + commandID + '\nItinerary ID: ' + this.state.ItineraryID);
+            Alert.alert('something went wrong', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
             return false;
         }
 
     }
-    async associate_trailer(trailerID) {
+    async Associate_trailer_to_itinerary(trailerID) {
 
-        const data = contract.methods.associate_trailer(trailerID).encodeABI();
+        const data = contract.methods.Associate_trailer_to_itinerary(trailerID).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
         const signedTx = await web3.eth.accounts.signTransaction(
             {
@@ -185,7 +185,7 @@ export default class PartDischarge extends Component {
         var jsonItinerary = {
             ItineraryID: this.state.ItineraryID,
             trailerIDs: this.state.trailerIds,
-            commandList: this.state.commandList,
+            orderList: this.state.orderList,
             totWeight: ItineraryInfo['0'],
             totVolume: ItineraryInfo['1']
         }
@@ -247,19 +247,19 @@ export default class PartDischarge extends Component {
 
 
                 var i = 0;
-                for (i; i < this.state.commandList.length; i++) {
+                for (i; i < this.state.orderList.length; i++) {
                     valid == false;
 
                     Title = 'Add an Itinerary?';
-                    message = 'Do you want to add order ID: ' + this.state.commandList[i].commandID + '\nto Itinerary ID: ' + this.state.ItineraryID;
+                    message = 'Do you want to add order ID: ' + this.state.orderList[i].orderID + '\nto Itinerary ID: ' + this.state.ItineraryID;
                     resolve = await AsyncAlert(Title, message);
                     if (resolve == 'YES') {
-                        valid = await this.associate_Itinerary(this.state.commandList[i].commandID);
+                        valid = await this.associate_Itinerary(this.state.orderList[i].orderID);
                     }
                     if (valid == false) {
-                        var newCommandList = this.state.commandList;
-                        newCommandList.splice(i, 1);
-                        this.setState({ commandList: newCommandList })
+                        var newOrderList = this.state.orderList;
+                        newOrderList.splice(i, 1);
+                        this.setState({ orderList: newOrderList })
                     }
 
                 }
@@ -270,7 +270,7 @@ export default class PartDischarge extends Component {
                     message = 'Do you want to add trailer ID: ' + this.state.trailerIds[i].trailerID + '\nto Itinerary ID: ' + this.state.ItineraryID;
                     resolve = await AsyncAlert(Title, message);
                     if (resolve == 'YES') {
-                        valid = await this.associate_trailer(this.state.trailerIds[i].trailerID);
+                        valid = await this.Associate_trailer_to_itinerary(this.state.trailerIds[i].trailerID);
                     }
                     if (valid == false) {
                         var newTrailerList = this.state.trailerIds;
@@ -306,9 +306,9 @@ export default class PartDischarge extends Component {
                 </View>
                 <View>
                     <Text style={styles.textTitle}>Select order you are discharging!</Text>
-                    {this.state.commandList.map((command, index) => {
-                        return <View key={command.commandID}>
-                            <Text style={styles.textList} onPress={() => this.dischargeOrder(index)} >{command.commandID}</Text>
+                    {this.state.orderList.map((order, index) => {
+                        return <View key={order.orderID}>
+                            <Text style={styles.textList} onPress={() => this.dischargeOrder(index)} >{order.orderID}</Text>
                         </View>
                     })
                     }

@@ -5,614 +5,11 @@ import './shim';
 
 import Container from './Container';
 
-const abi = [
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_unique",
-				"type": "uint256"
-			}
-		],
-		"name": "Associate_Command",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			}
-		],
-		"name": "Associate_Itinerary",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "Itinerary_start",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_CO2Counter",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_truckID",
-				"type": "uint256"
-			}
-		],
-		"name": "Itinerary_stop",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_weight",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_volume",
-				"type": "uint256"
-			}
-		],
-		"name": "New_product",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trailerID",
-				"type": "uint256"
-			}
-		],
-		"name": "associate_trailer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "ipfsHash",
-				"type": "string"
-			}
-		],
-		"name": "command_completed",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_ItineraryID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_Itinerary_emission",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_ItineraryID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_Itinerary_info",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_index",
-				"type": "uint8"
-			}
-		],
-		"name": "get_command_Itinerary_list_index",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_command_Itinerary_list_size",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_commandID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_command_info",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "get_current_ItineraryID",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "get_current_command_id",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "get_numUPC",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "nb",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_unique",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "get_product_commandID",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_unique",
-				"type": "uint256"
-			}
-		],
-		"name": "get_product_commands_size",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_ItineraryID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_product_emission",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_trailerID",
-				"type": "uint256"
-			}
-		],
-		"name": "get_trailer_current_Itinerary",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "get_trucker_current_ItineraryID",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			}
-		],
-		"name": "get_upc_Volume",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "Volume",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_upc",
-				"type": "string"
-			}
-		],
-		"name": "get_upc_weight",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "Weight",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_ItineraryID",
-				"type": "uint256"
-			}
-		],
-		"name": "grab_Itinerary",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_IpfsItineraryHash",
-				"type": "string"
-			}
-		],
-		"name": "loading_completed",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "new_Itinerary",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "ItineraryID",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [],
-		"name": "new_command",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "commandID",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-];
-const contract_address = '0x2CE6a9050599abc80f5AECd93ecfAE30fF1A4F90';
+const $abi = require('./ABI_and_keys')
+
+const mnemonic = $abi.mnemonic
+const abi = $abi.abi
+const contract_address = $abi.contract_address
 
 const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
@@ -620,25 +17,24 @@ const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" })
 
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
-const mnemonic = 'wagon sick artefact august more home program science famous fun magnet crew'; // 12 word mnemonic
+
 const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
 const web3 = new Web3(Provider);
 const contract = new web3.eth.Contract(abi, contract_address);
-const privateKey = '0x2f5a91464049996a4948ed874409f4cfc56c775ee89760bf9db212927668acb7'
-const publicKey = '0xf9Bb59aF9eC60D64274a4d2a61D55CB004FBEa5e'
+
 
 const Separator = () => (
 	<View style={styles.separator} />
 );
 
-const Item = ({ commandID }) => (
+const Item = ({ orderID }) => (
 	<View>
-		<Text>{commandID}</Text>
+		<Text>{orderID}</Text>
 	</View>
 );
 
 const renderItem = ({ item }) => (
-	<Item commandID={item.commandID} />
+	<Item orderID={item.orderID} />
 );
 
 export default class Info extends Component {
@@ -649,7 +45,7 @@ export default class Info extends Component {
 			UPC: "scan a product",
 			Unique: 0,
 			Json_Product_info: {
-				commandIDList: [],
+				orderIDList: [],
 				productTotEmission: 0
 			},
 			ItineraryInfo: "",
@@ -669,9 +65,9 @@ export default class Info extends Component {
 
 	async Get_product_info(UPC, unique) {
 		var lenght = 0;
-		var commandLenght;
+		var orderLenght;
 		var ItineraryLenght;
-		var commandID;
+		var orderID;
 		var ItineraryID;
 		var totProductEmission = 0;
 		var ProductCO2EmissionPart = 0;
@@ -679,11 +75,11 @@ export default class Info extends Component {
 
 
 		var JsonProductInfo = {
-			"commandIDList": []
+			"orderIDList": []
 		}
 
 		try {
-			commandLenght = await contract.methods.get_product_commands_size(UPC, unique).call();
+			orderLenght = await contract.methods.get_product_orders_size(UPC, unique).call();
 			console.log(lenght);
 		}
 		catch (e) {
@@ -692,22 +88,22 @@ export default class Info extends Component {
 
 
 		var i = 0;
-		for (i = 0; i < commandLenght; i++) {
+		for (i = 0; i < orderLenght; i++) {
 
-			commandID = await contract.methods.get_product_commandID(UPC, unique, i).call();
-			await this.get_command_info(commandID);
+			orderID = await contract.methods.get_product_orderID(UPC, unique, i).call();
+			await this.get_order_info(orderID);
 
-			var newCommandID = {
-				"commandID": commandID,
-				"commandHash": this.state.orderInfo['3'],
+			var newOrderID = {
+				"orderID": orderID,
+				"orderHash": this.state.orderInfo['3'],
 				"ItineraryList": []
 			};
 
 			try {
-				ItineraryLenght = await contract.methods.get_command_Itinerary_list_size(commandID).call();
+				ItineraryLenght = await contract.methods.get_order_Itinerary_list_size(orderID).call();
 				var j = 0;
 				for (j = 0; j < ItineraryLenght; j++) {
-					ItineraryID = await contract.methods.get_command_Itinerary_list_index(commandID, j).call();
+					ItineraryID = await contract.methods.get_order_Itinerary_list_index(orderID, j).call();
 
 					await this.get_Itinerary_info(ItineraryID);
 					ProductCO2EmissionPart = await contract.methods.get_product_emission(UPC, ItineraryID).call();
@@ -721,19 +117,19 @@ export default class Info extends Component {
 						"ProductCO2EmissionPart": ProductCO2EmissionPart
 					};
 
-					newCommandID["ItineraryList"].push(newItineraryID)
+					newOrderID["ItineraryList"].push(newItineraryID)
 				}
 			}
 			catch (e) {
 				console.log(e);
-				console.log("some command are not yet assigned to an Itinerary")
+				console.log("some order are not yet assigned to an Itinerary")
 			}
-			JsonProductInfo["commandIDList"].push(newCommandID);
+			JsonProductInfo["orderIDList"].push(newOrderID);
 			JsonProductInfo["productTotEmission"] = totProductEmission;
 		}
 		console.log(JsonProductInfo);
 		this.setState({ Json_Product_info: JsonProductInfo })
-		return commandLenght;
+		return orderLenght;
 	}
 
 	async get_Itinerary_info(ItineraryID) {
@@ -743,18 +139,18 @@ export default class Info extends Component {
 			return ItineraryInfo;
 		}
 		catch (e) {
-			Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
+			Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + ItineraryID);
 		}
 	}
 
-	async get_command_info(commandID) {
+	async get_order_info(orderID) {
 		try {
-			var orderInfo = await contract.methods.get_command_info(commandID).call();
+			var orderInfo = await contract.methods.get_order_info(orderID).call();
 			this.setState({ orderInfo: orderInfo });
 			return orderInfo;
 		}
 		catch (e) {
-			Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + commandID);
+			Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + orderID);
 		}
 	}
 	render() {
@@ -784,17 +180,17 @@ export default class Info extends Component {
 				<View>
 					<Text style={styles.textBold}>UPC: {this.state.UPC}</Text>
 					<Text style={styles.textBold}>Unique: {this.state.Unique}</Text>
-					{this.state.Json_Product_info.commandIDList.map((command, index) => {
-						return <View key={command.commandID}>
-							<Text style={styles.textBold}>command ID: {command.commandID}</Text>
+					{this.state.Json_Product_info.orderIDList.map((order, index) => {
+						return <View key={order.orderID}>
+							<Text style={styles.textBold}>order ID: {order.orderID}</Text>
 							<Text style={styles.ipfs}
-								onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + command.commandHash)}
-							>IPFS order hash: {String(command.commandHash)}
+								onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + order.orderHash)}
+							>IPFS order hash: {String(order.orderHash)}
 							</Text>
 							{
-								command.ItineraryList.map((Itinerary, index) => {
+								order.ItineraryList.map((Itinerary, index) => {
 									return <>
-										<View key={command.commandID}>
+										<View key={order.orderID}>
 											<Text style={styles.textBold}>  Itinerary ID: {Itinerary.ItineraryID} </Text>
 											<Text style={styles.ipfs}
 												onPress={() => Linking.openURL("https://ipfs.infura.io/ipfs/" + Itinerary.ItineraryHash)}

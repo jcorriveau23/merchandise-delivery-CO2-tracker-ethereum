@@ -7,16 +7,16 @@ contract Command_preparator{
         mapping (string => UPCIds) UpcToIndex;
         uint numUPC;
 
-        Command[] commands;
-        uint numCommands;
+        Order[] orders;
+        uint numOrders;
 
         Itinerary[] Itinerarys;
         uint numItinerarys;
 
-        mapping(address => uint) openCommandID;  // link the orderpicker to is current order ID
+        mapping(address => uint) openOrderID;  // link the orderpicker to is current order ID
         mapping(address => uint) LoadingAttendantOpenItineraryID;  // link the loading attendant to his current Itinerary ID
         mapping(address => uint) TruckerOpenItineraryID;  // link the trucker to his current Itinerary ID
-        mapping(uint => uint) TrailerCurrentItinerary; //  Ling the trailer to his current Itinerary ID
+        mapping(uint => trailer) TrailerCurrentItinerary; //  Ling the trailer to his current Itinerary ID
     }
 
     struct UPC {                                // store the weight and volume of a specific product (UPC)
@@ -27,33 +27,37 @@ contract Command_preparator{
         uint numberProduct;                     // number of unique instantiation
     }
 
+    struct trailer {
+        uint currentItineraryID;
+        bool isValue;
+    }
+
     struct UPCIds {         // index of the UPC array that doesn't allowed duplication
         uint ID;
         bool isValue;
     }
 
     struct Product {
-        uint[] commandIDs; // dynamic list of commands that is link to this unique product
+        uint[] orderIDs; // dynamic list of orders that is link to this unique product
         uint8 size;
     }
 
-    struct Command {
-        uint[] ItineraryIDs;  // dynamic list of ItineraryIDs taken by the command
-        uint8 size;         // keep tracks of the number of Itinerary the command take parts in
-        uint totWeight;     // total weight of the command = sums of products weight
-        uint totVolume;     // total volume of the command = sums of products volume
+    struct Order {
+        uint[] ItineraryIDs;  // dynamic list of ItineraryIDs taken by the order
+        uint8 size;         // keep tracks of the number of Itinerary the order take parts in
+        uint totWeight;     // total weight of the order = sums of products weight
+        uint totVolume;     // total volume of the order = sums of products volume
 
-        bool done;          // 'true' when the command is ready to be charge
-        string ipfsCommandHash;
-        //uint co2Emission
+        bool done;          // 'true' when the order is ready to be charge
+        string ipfsOrderHash;
     }
 
     struct Itinerary {
         uint[] TrailerIDs;  // dynamic list of trailerID (some truc can carry more than one trailer)
         uint8 nbTrailers;    //
         uint truckID;       // truck that drive the Itinerary
-        uint totWeight;     // total weight of the Itinerary = sums of commands total weight
-        uint totVolume;     // total volume of the Itinerary = sums of commands total volume
+        uint totWeight;     // total weight of the Itinerary = sums of orders total weight
+        uint totVolume;     // total volume of the Itinerary = sums of orders total volume
         // uint fromID;
         // uint toID;
         bool loaded;         // true when the Itinerary is fully charged
@@ -93,7 +97,7 @@ contract Command_preparator{
     // description: register a new product (same UPC can't be registered twice)
     // input: _UPC, _weight, _volume of the new product
     // output:
-    function New_product(string memory _upc, uint _weight, uint _volume) public returns(uint) {
+    function register_product(string memory _upc, uint _weight, uint _volume) public returns(uint) {
 
         require(D.UpcToIndex[_upc].isValue == false, 'product already registered');
         // Product not generated yet
@@ -112,150 +116,148 @@ contract Command_preparator{
         return 1;
     }
 
-    // new_command
-    // description: create a new command and return the ID of the command
+    // new_order
+    // description: create a new order and return the ID of the order
     // input: N/A
-    // return: ID of the command (index in the commands array)
-    function new_command() public returns(uint commandID){
+    // return: ID of the order (index in the orders array)
+    function init_order() public returns(uint orderID){
         
-        uint _commandID = D.openCommandID[msg.sender];
-        if(_commandID < D.numCommands){   
-            require(D.commands[_commandID].done == true, "already have an open command");  
+        uint _orderID = D.openOrderID[msg.sender];
+        if(_orderID < D.numOrders){   
+            require(D.orders[_orderID].done == true, "already have an open Order");  
         }
         
-        Command memory newCommand;
-        newCommand.size = 0;
-        newCommand.totWeight = 0;
-        newCommand.totVolume = 0;
-        newCommand.done = false;
+        Order memory newOrder;
+        newOrder.size = 0;
+        newOrder.totWeight = 0;
+        newOrder.totVolume = 0;
+        newOrder.done = false;
 
-        D.commands.push(newCommand);
-        D.openCommandID[msg.sender] = D.numCommands;
+        D.orders.push(newOrder);
+        D.openOrderID[msg.sender] = D.numOrders;
         
-        D.numCommands++;
+        D.numOrders++;
 
-        return (D.numCommands - 1);  // return the index (commandID) of this new command
+        return (D.numOrders - 1);  // return the index (orderID) of this new order
     }
 
-    // Associate_command
-    // description: add to a unique product's commandIDs list, a new command
+    // Associate_order
+    // description: add to a unique product's orderIDs list, a new order
     // input:
     // return:
-     function Associate_Command(string memory _upc, uint _unique) public returns(uint) {
+     function Associate_order_to_unique_product(string memory _upc, uint _unique) public returns(uint) {
         
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
         
-        uint _commandID = D.openCommandID[msg.sender];
-        if(_commandID < D.numCommands){   
-            require(D.commands[_commandID].done == false, "command must not be completed");  
+        uint _orderID = D.openOrderID[msg.sender];
+        if(_orderID < D.numOrders){   
+            require(D.orders[_orderID].done == false, "order must not be completed");  
         }
          
-         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the command in the unique product array
-         // if first command that we add to the product
+         uint8 size =  D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;   // index that point where to add the order in the unique product array
+         // if first order that we add to the product
          if (size == 0){
              D.upcs[D.UpcToIndex[_upc].ID].numberProduct++;       //new instantiation of the product 
          }
          else{
-             uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[size - 1];    // last command
-             require(D.commands[index].done == true, 'a command not completed is already assigned to this product');
-             // require that the Itinerary is done not only the last command------------------------------------------------------------------------------------
+             uint index = D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].orderIDs[size - 1];    // last order
+             require(D.orders[index].done == true, 'a order not completed is already assigned to this product');
+             // require that the Itinerary is done not only the last order------------------------------------------------------------------------------------
          }
 
-         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs.push(_commandID); // add the command to the list
+         D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].orderIDs.push(_orderID); // add the order to the list
          D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size++;
 
-         D.commands[_commandID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to Itinerary
-         D.commands[_commandID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
+         D.orders[_orderID].totWeight += D.upcs[D.UpcToIndex[_upc].ID].Weight;  // add product weight and volume to Itinerary
+         D.orders[_orderID].totVolume += D.upcs[D.UpcToIndex[_upc].ID].Volume;
 
          return 1;
      }
 
-    // get_product_commands_size
-    // description: return the size of a product's command list
+    // get_product_orders_size
+    // description: return the size of a product's order list
     // input: _upc and _unique of a unique product
-    // return: commandIDs list size
-    function get_product_commands_size(string memory _upc, uint _unique) public view returns(uint){
+    // return: orderIDs list size
+    function get_product_orders_size(string memory _upc, uint _unique) public view returns(uint){
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
-        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No command registered yet');
+        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No Order registered yet');
 
         return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size;
     }
 
-    // get_product_commandID
-    // description: return a single commandID of the list
-    // input: _upc and _unique of a unique product + _index of the commandIDs list we want to check
-    // return: commandID
-    function get_product_commandID(string memory _upc, uint _unique, uint _index) public view returns(uint){
+    // get_product_orderID
+    // description: return a single orderID of the list
+    // input: _upc and _unique of a unique product + _index of the orderIDs list we want to check
+    // return: orderID
+    function get_product_orderID(string memory _upc, uint _unique, uint _index) public view returns(uint){
 
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
-        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No command registered yet');
+        require(D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size != 0, 'No Order registered yet');
         require(_index < D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].size, 'index out of bound');
         
         
-        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].commandIDs[_index];  // return the ItineraryID of the index
+        return D.upcs[D.UpcToIndex[_upc].ID].uniqueProduct[_unique].orderIDs[_index];  // return the ItineraryID of the index
     }
 
-    // get_command_info
-    // description: return the info of a command
-    // input: _commandID
-    // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_command_info(uint _commandID) public view returns(uint, uint, bool, string memory){
-        require(_commandID < D.numCommands, 'this command does not exist');
+    // get_order_info
+    // description: return the info of a order
+    // input: _orderID
+    // return: total weight of the order, total volume of the order and if the order is done or not
+    function get_order_info(uint _orderID) public view returns(uint, uint, bool, string memory){
+        require(_orderID < D.numOrders, 'this Order does not exist');
 
-        return (D.commands[_commandID].totWeight, D.commands[_commandID].totVolume, D.commands[_commandID].done, D.commands[_commandID].ipfsCommandHash);
+        return (D.orders[_orderID].totWeight, D.orders[_orderID].totVolume, D.orders[_orderID].done, D.orders[_orderID].ipfsOrderHash);
     }
 
-     // get_command_info
-    // description: return the info of a command
-    // input: _commandID
-    // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_current_command_id() public view returns(uint){
+     // get_order_info
+    // description: return the info of a order
+    // input: _orderID
+    // return: total weight of the order, total volume of the order and if the order is done or not
+    function get_current_order_id() public view returns(uint){
 
-        return D.openCommandID[msg.sender];
+        return D.openOrderID[msg.sender];
     }
 
-    // command_completed
-    // description: set the command completed on the blockchain, it can now be store in an Itinerary
-    // input: _commandID
+    // order_completed
+    // description: set the order completed on the blockchain, it can now be store in an Itinerary
+    // input: _orderID
     // return: 
-    function command_completed(string memory ipfsHash) public returns(bool){
+    function close_order(string memory ipfsHash) public returns(bool){
 
-        uint _commandID = D.openCommandID[msg.sender];
-        require(D.commands[_commandID].done == false, 'this command is already done');
+        uint _orderID = D.openOrderID[msg.sender];
+        require(D.orders[_orderID].done == false, 'this Order is already done');
 
-        D.commands[_commandID].done = true;
-        D.commands[_commandID].ipfsCommandHash = ipfsHash;
+        D.orders[_orderID].done = true;
+        D.orders[_orderID].ipfsOrderHash = ipfsHash;
         return true;
     }
     
-    // get_command_Itinerary_list_size
-    // description: return the number of Itinerary this command has take part of
-    // input: _commandID
-    // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_command_Itinerary_list_size(uint _commandID) public view returns(uint8){
-        require(_commandID < D.numCommands, 'this command does not exist');
+    // get_order_Itinerary_list_size
+    // description: return the number of Itinerary this order has take part of
+    // input: _orderID
+    // return: total weight of the order, total volume of the order and if the order is done or not
+    function get_order_Itinerary_list_size(uint _orderID) public view returns(uint8){
+        require(_orderID < D.numOrders, 'this Order does not exist');
 
-        return D.commands[_commandID].size;
+        return D.orders[_orderID].size;
     }
     
-    // get_command_Itinerary_list_index
-    // description: one ItineraryID of the command's ItineraryIDs list
-    // input: _commandID, _index
-    // return: total weight of the command, total volume of the command and if the command is done or not
-    function get_command_Itinerary_list_index(uint _commandID, uint8 _index) public view returns(uint){
-        require(_commandID < D.numCommands, 'this command does not exist');
-        require(D.commands[_commandID].size > _index);
+    // get_order_Itinerary_list_index
+    // description: one ItineraryID of the order's ItineraryIDs list
+    // input: _orderID, _index
+    // return: total weight of the order, total volume of the order and if the order is done or not
+    function get_order_Itinerary_list_index(uint _orderID, uint8 _index) public view returns(uint){
+        require(_orderID < D.numOrders, 'this Order does not exist');
+        require(D.orders[_orderID].size > _index);
 
-        return D.commands[_commandID].ItineraryIDs[_index];
+        return D.orders[_orderID].ItineraryIDs[_index];
     }
     
-   
-
     // new_Itinerary
     // description: create a new Itinerary
     // input: N/A
     // return: the ItineraryID of the new Itinerary (index of the Itinerarys list)
-    function new_Itinerary() public returns(uint ItineraryID){
+    function init_itinerary() public returns(uint ItineraryID){
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         
         if(_ItineraryID < D.numItinerarys){   
@@ -294,18 +296,18 @@ contract Command_preparator{
     }
     
     // Associate_Itinerary
-    // description: add a command to an Itinerary
-    // input: ID of a command and ID of the Itinerary
+    // description: add a order to an Itinerary
+    // input: ID of a order and ID of the Itinerary
     // return: 
-     function Associate_Itinerary(uint _commandID) public returns(bool) {
+     function Associate_itinerary_to_order(uint _orderID) public returns(bool) {
         
-        require(_commandID < D.numCommands, "this command does not exist");
-        require(D.commands[_commandID].done == true, "this command is not completed");
-        uint size = D.commands[_commandID].size; // index where to add the new ItineraryID
+        require(_orderID < D.numOrders, "this Order does not exist");
+        require(D.orders[_orderID].done == true, "this Order is not completed");
+        uint size = D.orders[_orderID].size; // index where to add the new ItineraryID
         if(size > 0){
-            // if command was already assigned to an Itinerary
-            uint last_ItineraryID = D.commands[_commandID].ItineraryIDs[size-1];
-            require(D.Itinerarys[last_ItineraryID].done == true, "an Itinerary not completed is already assigned to that command");
+            // if order was already assigned to an Itinerary
+            uint last_ItineraryID = D.orders[_orderID].ItineraryIDs[size-1];
+            require(D.Itinerarys[last_ItineraryID].done == true, "an Itinerary not completed is already assigned to that Order");
         }
         
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
@@ -314,27 +316,32 @@ contract Command_preparator{
         
         
         
-        D.commands[_commandID].ItineraryIDs.push(_ItineraryID);
-        D.commands[_commandID].size++;
+        D.orders[_orderID].ItineraryIDs.push(_ItineraryID);
+        D.orders[_orderID].size++;
         
-        D.Itinerarys[_ItineraryID].totWeight += D.commands[_commandID].totWeight;
-        D.Itinerarys[_ItineraryID].totVolume += D.commands[_commandID].totVolume;
+        D.Itinerarys[_ItineraryID].totWeight += D.orders[_orderID].totWeight;
+        D.Itinerarys[_ItineraryID].totVolume += D.orders[_orderID].totVolume;
         
         return true;
      }
      
     // associate_trailer
     // description: add a trailers ID to the Itinerarys (a truck transport multiple trailers)
-    // input: ID of a command and ID of the Itinerary
+    // input: ID of a order and ID of the Itinerary
     // return:      
-    function associate_trailer(uint _trailerID) public returns(bool) {
+    function Associate_trailer_to_itinerary(uint _trailerID) public returns(bool) {
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         require(_ItineraryID < D.numItinerarys, 'this Itinerary does not exist');
         require(D.Itinerarys[_ItineraryID].loaded == false, "this Itinerary must not be already loaded");
-        
+        if(D.TrailerCurrentItinerary[_trailerID].isValue == true){
+            require(D.Itinerarys[D.TrailerCurrentItinerary[_trailerID].currentItineraryID].done == true, "trailer current itinery is not done");
+        }
+        else{
+            D.TrailerCurrentItinerary[_trailerID].isValue = true;
+        }
         D.Itinerarys[_ItineraryID].TrailerIDs.push(_trailerID);
         D.Itinerarys[_ItineraryID].nbTrailers++;
-        D.TrailerCurrentItinerary[_trailerID] = _ItineraryID;
+        D.TrailerCurrentItinerary[_trailerID].currentItineraryID = _ItineraryID;
     }
     
     function get_Itinerary_info(uint _ItineraryID) public view returns(uint, uint, uint, bool, bool, bool, string memory){
@@ -344,7 +351,8 @@ contract Command_preparator{
     }
     
     function get_trailer_current_Itinerary(uint _trailerID) public view returns(uint){
-        return D.TrailerCurrentItinerary[_trailerID];
+        require(D.TrailerCurrentItinerary[_trailerID].isValue == true, "trailer does not exist");
+        return D.TrailerCurrentItinerary[_trailerID].currentItineraryID;
     }
     
     function get_trucker_current_ItineraryID() public view returns(uint){

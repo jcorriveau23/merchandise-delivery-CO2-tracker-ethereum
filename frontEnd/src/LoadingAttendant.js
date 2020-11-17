@@ -30,7 +30,7 @@ export default class LoadingAttendant extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			commandID: 0,
+			orderID: 0,
 			ItineraryInfo: "",
 
 			ItineraryID: 0,
@@ -40,12 +40,12 @@ export default class LoadingAttendant extends Component {
 		};
 	}
 	async going_back() {
-		var commandID = await this.props.navigation.getParam("data", "No data read");
+		var orderID = await this.props.navigation.getParam("data", "No data read");
 		var functions = await this.props.navigation.getParam("function", "No data read");
 		var added = await this.props.navigation.getParam("added", "No data read");
 		var trailerID = await this.props.navigation.getParam("trailerID", "No data read");
 
-		this.setState({ commandID: commandID });
+		this.setState({ orderID: orderID });
 		this.setState({ function: functions });
 
 		// info has been added to the Itinerary
@@ -57,11 +57,11 @@ export default class LoadingAttendant extends Component {
 			var Itinerary = await AsyncStorage.getItem('Itinerary');
 
 
-			if (functions.includes("Itinerary")) {
-				var orderInfo = await contract.methods.get_command_info(commandID).call();
+			if (functions.includes("Associate_itinerary_to_order")) {
+				var orderInfo = await contract.methods.get_order_info(orderID).call();
 
-				var newCommand = {
-					"commandID": commandID,
+				var newOrder = {
+					"orderID": orderID,
 					"totWeight": orderInfo['0'],
 					"totVolume": orderInfo['1']
 				}
@@ -69,30 +69,31 @@ export default class LoadingAttendant extends Component {
 				await this.get_Itinerary_info(this.state.ItineraryID, false);
 
 				if (Itinerary == null) {
-					// no Itinerary stored first command added
-					currentItinerary.push(newCommand);
+					// no Itinerary stored first order added
+					currentItinerary.push(newOrder);
 					var jsonItinerary = {
 						"ItineraryID": this.state.ItineraryID,
 						"trailerIDs": [],
-						"commandList": currentItinerary
+						"orderList": currentItinerary
 					};
 					currentItineraryString = JSON.stringify(jsonItinerary);
 				}
 				else {
 					var currentItineraryJSON = JSON.parse(Itinerary);
-					currentItineraryJSON['commandList'].push(newCommand);
+					currentItineraryJSON['orderList'].push(newOrder);
 					currentItineraryString = JSON.stringify(currentItineraryJSON);
 				}
 
 			}
 
-			else if (functions.includes("trailer")) {
+			else if (functions.includes("Associate_trailer_to_itinerary")) {
+				console.log()
 				if (Itinerary == null) {
 					// no Itinerary stored first trailer added
 					var jsonItinerary = {
 						"ItineraryID": this.state.ItineraryID,
 						"trailerIDs": [],
-						"commandList": []
+						"orderList": []
 					};
 					jsonItinerary["trailerIDs"].push(trailerID)
 					currentItineraryString = JSON.stringify(jsonItinerary);
@@ -117,7 +118,7 @@ export default class LoadingAttendant extends Component {
 
 	async init_Itinerary() {
 
-		const data = contract.methods.new_Itinerary().encodeABI();
+		const data = contract.methods.init_itinerary().encodeABI();
 		const nonce = await web3.eth.getTransactionCount(publicKey);
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
@@ -200,17 +201,17 @@ export default class LoadingAttendant extends Component {
 	}
 
 	async get_Itinerary_info(ItineraryID, alert) {
-		console.log('get_command_info');
+		console.log('get_order_info');
 		try {
 			var ItineraryInfo = await contract.methods.get_Itinerary_info(ItineraryID).call();
 			this.setState({ ItineraryInfo: ItineraryInfo });
 			if (alert == true) {
-				Alert.alert('Itinerary info', 'Itinerary ID: ' + commandID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
+				Alert.alert('Itinerary info', 'Itinerary ID: ' + orderID + '\nTruck ID: ' + orderInfo['0'] + '\nTotal weight: ' + orderInfo['1'] + '\nTotal volume: ' + orderInfo['2'] + '\nCO2 emission: ' + orderInfo['3'] + '\nDone: ' + orderInfo['4']);
 			}
 			return ItineraryInfo;
 		}
 		catch (e) {
-			//Alert.alert('Error: this command ID does not exist', 'Itinerary ID: ' + ItineraryID);
+			//Alert.alert('Error: this order ID does not exist', 'Itinerary ID: ' + ItineraryID);
 		}
 	}
 	render() {
@@ -252,7 +253,7 @@ export default class LoadingAttendant extends Component {
 						color={'green'}
 						title={"Associate trailer to Itinerary"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "associate_trailer",
+							data: "Associate_trailer_to_itinerary",
 							ItineraryID: this.state.ItineraryID
 						})}
 					/>
@@ -262,9 +263,9 @@ export default class LoadingAttendant extends Component {
 				<View>
 					<Button
 						color={'green'}
-						title={"add command"}
+						title={"add order"}
 						onPress={() => this.props.navigation.navigate("QRCodeScannerScreen", {
-							data: "associate_Itinerary",
+							data: "Associate_itinerary_to_order",
 							ItineraryID: this.state.ItineraryID
 						})}
 					/>
