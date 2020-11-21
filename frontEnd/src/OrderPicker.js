@@ -26,6 +26,20 @@ const Separator = () => (
 	<View style={styles.separator} />
 );
 
+const AsyncAlert = (Title, message) => {
+    return new Promise((resolve, reject) => {
+        Alert.alert(
+            Title,
+            message,
+            [
+                { text: 'YES', onPress: () => resolve('YES') },
+                { text: 'NO', onPress: () => resolve('NO') }
+            ],
+            { cancelable: false }
+        )
+    })
+}
+
 export default class OrderPicker extends Component {
 
 	constructor(props) {
@@ -55,8 +69,6 @@ export default class OrderPicker extends Component {
 
 			var currentOrder = [];
 			var currentOrderString = "";
-
-
 
 			if (added == true) {
 				// async storage the new items	
@@ -112,75 +124,81 @@ export default class OrderPicker extends Component {
 			},
 			privateKey
 		);
-		try {
-			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		var resolve = await AsyncAlert('Do you want to initiate a new order?');
+		if(resolve = "YES"){
+			try {
+				await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-			var neworderID = await contract.methods.get_current_order_id().call();
-			this.setState({ orderID: neworderID });
-			this.setState({ IpfsURL: "" })
-			await this.get_order_info(neworderID, false);
+				var neworderID = await contract.methods.get_current_order_id().call();
+				this.setState({ orderID: neworderID });
+				this.setState({ IpfsURL: "" })
+				await this.get_order_info(neworderID, false);
 
-			Alert.alert('Order created', 'Order ID: ' + this.state.orderID);
-		} catch (error) {
-			if (error.toString().includes("already have an open order")) {
-				Alert.alert('Error: user already have an open order', 'open orderID: ' + this.state.orderID);
+				Alert.alert('Order created', 'Order ID: ' + this.state.orderID);
+			} catch (error) {
+				if (error.toString().includes("already have an open order")) {
+					Alert.alert('Error: user already have an open order', 'open orderID: ' + this.state.orderID);
+				}
 			}
 		}
 	}
 
 	async close_order() {
+		var resolve = await AsyncAlert('Do you want to close this order?');
+		if(resolve = "YES"){
+			try {
+				var order = await AsyncStorage.getItem('order');
+				var jsonOrder = JSON.parse(order);
+				jsonOrder['totWeight'] = this.state.orderInfo['0'];
+				jsonOrder['totVolume'] = this.state.orderInfo['1'];
+				jsonOrder['timeStamp'] = new Date();
+				var hash = await ipfs.add(JSON.stringify(jsonOrder));
 
-		try {
-			var order = await AsyncStorage.getItem('order');
-			var jsonOrder = JSON.parse(order);
-			jsonOrder['totWeight'] = this.state.orderInfo['0'];
-			jsonOrder['totVolume'] = this.state.orderInfo['1'];
-			var hash = await ipfs.add(JSON.stringify(jsonOrder));
 
+				var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
 
-			var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
-
-			console.log(IpfsURL);
-		}
-		catch (error) {
-			console.log(error);
-			if (error.toString().includes("null is not an object")) {
-				Alert.alert('Error: nothing in order', 'wont store order in IPFS\norderID: ' + this.state.orderID);
-				var hash = 0; //
+				console.log(IpfsURL);
 			}
-			else {
-				Alert.alert('Error: IPFS Storing did not work', 'orderID: ' + this.state.orderID);
-				return -1;
+			catch (error) {
+				console.log(error);
+				if (error.toString().includes("null is not an object")) {
+					Alert.alert('Error: nothing in order', 'wont store order in IPFS\norderID: ' + this.state.orderID);
+					var hash = 0; //
+				}
+				else {
+					Alert.alert('Error: IPFS Storing did not work', 'orderID: ' + this.state.orderID);
+					return -1;
+				}
 			}
-		}
 
-		const data = contract.methods.close_order(hash).encodeABI();  // send (32 + 2) bytes ipfs hash
-		const nonce = await web3.eth.getTransactionCount(publicKey);
-		const signedTx = await web3.eth.accounts.signTransaction(
-			{
-				nonce: nonce,
-				gasLimit: '0x200710',
-				gasPrice: '0x0A',
-				to: contract_address,
-				data: data,
-			},
-			privateKey
-		);
-		try {
-			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-			await this.get_order_info(this.state.orderID, false);
+			const data = contract.methods.close_order(hash).encodeABI();  // send (32 + 2) bytes ipfs hash
+			const nonce = await web3.eth.getTransactionCount(publicKey);
+			const signedTx = await web3.eth.accounts.signTransaction(
+				{
+					nonce: nonce,
+					gasLimit: '0x200710',
+					gasPrice: '0x0A',
+					to: contract_address,
+					data: data,
+				},
+				privateKey
+			);
+			try {
+				await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+				await this.get_order_info(this.state.orderID, false);
 
-			Alert.alert('Order closed', 'Order ID: ' + this.state.orderID + '\n' + 'IPFS hash: ' + IpfsURL);
-			this.setState({ IpfsURL: IpfsURL })
-			AsyncStorage.removeItem("order");
+				Alert.alert('Order closed', 'Order ID: ' + this.state.orderID + '\n' + 'IPFS hash: ' + IpfsURL);
+				this.setState({ IpfsURL: IpfsURL })
+				AsyncStorage.removeItem("order");
 
-		} catch (error) {
-			if (error.toString().includes("user has no open order")) {
-				Alert.alert('Error: user has no open order', 'close orderID: ' + this.state.orderID);
+			} catch (error) {
+				if (error.toString().includes("user has no open order")) {
+					Alert.alert('Error: user has no open order', 'close orderID: ' + this.state.orderID);
+				}
 			}
+	
 		}
 	}
-
 	async get_order_info(orderID, alert) {
 		console.log('get_order_info');
 		try {

@@ -20,6 +20,20 @@ const web3 = new Web3(Provider);
 const contract = new web3.eth.Contract(abi, contract_address);
 web3.eth.defaultAccount = '0x653fbbf28aDDBf0b0526026e238eF42C377d62DC';
 
+const AsyncAlert = (Title, message) => {
+    return new Promise((resolve, reject) => {
+        Alert.alert(
+            Title,
+            message,
+            [
+                { text: 'YES', onPress: () => resolve('YES') },
+                { text: 'NO', onPress: () => resolve('NO') }
+            ],
+            { cancelable: false }
+        )
+    })
+}
+
 export default class QRCodeScannerScreen extends Component {
 constructor(props){
     super(props);
@@ -133,14 +147,16 @@ async register_product(UPC, Weight, Volume) {
 		},
 		privateKey
 	);
-	try{
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Good Job!','New Product registered!\nUPC: ' +UPC +'\nWeight: ' +Weight +' kg\nVolume: ' +Volume +' cm^3');
-
-	}catch(error){
-		if (error.toString().includes("product already registered")) {
-              Alert.alert('OUPS!','this product was already registered:\nUPC: ' + UPC);
-		} 
+	var resolve = await AsyncAlert('Do you want to register this product?', 'UPC: ' +UPC +'\nWeight: ' +Weight +' kg\nVolume: ' +Volume +' cm^3');
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess','Product registered:\nUPC: ' + UPC);
+		}catch(error){
+			if (error.toString().includes("product already registered")) {
+				  Alert.alert('Error','this product was already registered:\nUPC: ' + UPC);
+			} 
+		}
 	}
 }
 async Associate_order_to_unique_product(UPC, UniquenessID) {
@@ -157,22 +173,25 @@ async Associate_order_to_unique_product(UPC, UniquenessID) {
 		},
 		privateKey
 	);
-	try{
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Order assigned to this product!','UPC: ' + UPC + '\nUnique ID: ' + UniquenessID + '\nOrder ID: ' + this.state.orderID,);
-		return true;
+	var resolve = await AsyncAlert('Do you want to assign a product to an order?', 'UPC: ' + UPC + '\nUnique ID: ' + UniquenessID + '\nOrder ID: ' + this.state.orderID);
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess: Order assigned to this product!','UPC: ' + UPC + '\nUnique ID: ' + UniquenessID + '\nOrder ID: ' + this.state.orderID,);
+			return true;
 
-	}catch(error){
-		if(error.toString().includes("order must not be completed")){
-			Alert.alert('Error: order must not be completed','Itinerary ID: ' + this.state.orderID);
+		}catch(error){
+			if(error.toString().includes("order must not be completed")){
+				Alert.alert('Error: order must not be completed','Itinerary ID: ' + this.state.orderID);
+			}
+			else if(error.toString().includes("an order not completed is already assigned to this product")){
+				Alert.alert('Error: Order already associated to that product','Order ID: ' + this.state.orderID);
+			}
+			else if(error.toString().includes("must be a product registered")){
+				Alert.alert('Error: product not registered','UPC: ' + UPC);
+			}
+			return false;
 		}
-		else if(error.toString().includes("an order not completed is already assigned to this product")){
-			Alert.alert('Error: Order already associated to that product','Order ID: ' + this.state.orderID);
-		}
-		else if(error.toString().includes("must be a product registered")){
-			Alert.alert('Error: product not registered','UPC: ' + UPC);
-		}
-		return false;
 	}
 }
 async Associate_itinerary_to_order(UPC, UniquenessID){
@@ -181,7 +200,7 @@ async Associate_itinerary_to_order(UPC, UniquenessID){
 		var orderID = await contract.methods.get_product_orderID(UPC, UniquenessID, lenght-1).call(); // get the last orderID associated to that Itinerary
 		this.setState({orderID: orderID});
 	}catch(error){
-		Alert.alert('this product was not assign to a order yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);	
+		Alert.alert('this product was not assign to an order yet', 'Product UPC: ' + UPC + '\nUnique ID: ' + UniquenessID);	
 	}
 
 	const data = contract.methods.Associate_itinerary_to_order(orderID).encodeABI();
@@ -196,14 +215,17 @@ async Associate_itinerary_to_order(UPC, UniquenessID){
 		},
 		privateKey
 	);
-	try{
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Itinerary assign to that order','order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
-		return true;
-		
-	}catch(error){
-		console.log(error);
-		Alert.alert('something went wrong', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
+	var resolve = await AsyncAlert('Do you want to assign an order to an itinerary?', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess: Itinerary assign to that order','order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
+			return true;
+			
+		}catch(error){
+			console.log(error);
+			Alert.alert('Error: ', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
+		}
 	}
 	return false;
 }
@@ -221,14 +243,17 @@ async Associate_trailer_to_itinerary(trailerID){
 		},
 		privateKey
 	);
-	try{
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('trailer ID assigned to Itinerary',"trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
-		return true;
-		
-	}catch(error){
-		console.log(error);
-		Alert.alert('Error', 'could not added trailerID to Itinerary\n' + "trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
+	var resolve = await AsyncAlert('Do you want to assign a trailer to an itinerary?', "trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess: trailer ID assigned to Itinerary',"trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
+			return true;
+			
+		}catch(error){
+			console.log(error);
+			Alert.alert('Error', 'could not added trailerID to Itinerary\n' + "trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
+		}
 	}
 	return false;
 }
@@ -248,14 +273,17 @@ async grab_Itinerary(trailerID){
 		},
 		privateKey
 	);
-	try{
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Grabed new Itinerary',"Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
-		return true;
-		
-	}catch(error){
-		console.log(error);
-		Alert.alert('Error', 'could not grabed this Itinerary\n' + "Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
+	var resolve = await AsyncAlert('Do you want to grab that itinerary?', "Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess: Grabed new Itinerary',"Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
+			return true;
+			
+		}catch(error){
+			console.log(error);
+			Alert.alert('Error', 'could not grabed this Itinerary\n' + "Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
+		}
 	}
 	return false;
 }
@@ -274,15 +302,17 @@ async Itinerary_start(co2Emission, truckID){
 		},
 		privateKey
 	);
-	try{
-		
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		Alert.alert('Itinerary started',"Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID + "\nCO2 counter at start: " + co2Emission);
-		return true;
-		
-	}catch(error){
-		console.log(error);
-		Alert.alert('Error', 'Itinerary could not started\n' + "Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID);
+	var resolve = await AsyncAlert('do you want to initiate the itinerary?',"Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID + "\nCO2 counter at start: " + co2Emission);
+	if(resolve = "YES"){
+		try{
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+			Alert.alert('Sucess: Itinerary started',"Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID + "\nCO2 counter at start: " + co2Emission);
+			return true;
+			
+		}catch(error){
+			console.log(error);
+			Alert.alert('Error', 'Itinerary could not started\n' + "Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID);
+		}
 	}
 	return false;
 }
@@ -302,17 +332,19 @@ async Itinerary_stop(co2Emission, truckID){
 		},
 		privateKey
 	);
-	try{
-		
-		await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-		co2Emission = await contract.methods.get_Itinerary_emission(ItineraryID).call();
+	var resolve = await AsyncAlert('Do you want to end this itierary?', "Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID + "\nTot CO2 emission: " + co2Emission);
+	if(resolve = "YES"){
+		try{
+			
+			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-		Alert.alert('Itinerary stoped',"Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID + "\nTot CO2 emission: " + co2Emission);
-		return true;
-		
-	}catch(error){
-		console.log(error);
-		Alert.alert('Error', 'Itinerary could not be stoped\n' + "Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID);
+			Alert.alert('Sucess: Itinerary stoped', "Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID + "\nTot CO2 emission: " + co2Emission);
+			return true;
+			
+		}catch(error){
+			console.log(error);
+			Alert.alert('Error', 'Itinerary could not be stoped\n' + "Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID);
+		}
 	}
 	return false;
 }

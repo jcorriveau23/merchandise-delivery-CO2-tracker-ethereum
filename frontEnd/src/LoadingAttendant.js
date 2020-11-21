@@ -25,6 +25,20 @@ const Separator = () => (
 	<View style={styles.separator} />
 );
 
+const AsyncAlert = (Title, message) => {
+    return new Promise((resolve, reject) => {
+        Alert.alert(
+            Title,
+            message,
+            [
+                { text: 'YES', onPress: () => resolve('YES') },
+                { text: 'NO', onPress: () => resolve('NO') }
+            ],
+            { cancelable: false }
+        )
+    })
+}
+
 export default class LoadingAttendant extends Component {
 
 	constructor(props) {
@@ -130,72 +144,78 @@ export default class LoadingAttendant extends Component {
 			},
 			privateKey
 		);
-		try {
-			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+		var resolve = await AsyncAlert('Do you want to initiate a new itinerary?');
+		if(resolve = "YES"){
+			try {
+				await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-			var newItineraryID = await contract.methods.get_current_ItineraryID().call();
-			this.setState({ ItineraryID: newItineraryID });
-			await this.get_Itinerary_info(newItineraryID, false);
+				var newItineraryID = await contract.methods.get_current_ItineraryID().call();
+				this.setState({ ItineraryID: newItineraryID });
+				await this.get_Itinerary_info(newItineraryID, false);
 
-			Alert.alert('Itinerary created', 'Itinerary ID: ' + this.state.ItineraryID);
-		} catch (error) {
-			if (error.toString().includes("already have an open Itinerary")) {
-				Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
+				Alert.alert('Sucess: Itinerary created', 'Itinerary ID: ' + this.state.ItineraryID);
+			} catch (error) {
+				if (error.toString().includes("already have an open Itinerary")) {
+					Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
+				}
 			}
 		}
 	}
 
 	async loading_completed() {
+		var resolve = await AsyncAlert('Do you want to complete the loading of this itinerary ?');
+		if(resolve = "YES"){
+			try {
+				var Itinerary = await AsyncStorage.getItem('Itinerary');
+				var jsonItinerary = JSON.parse(Itinerary);
+				jsonItinerary['totWeight'] = this.state.ItineraryInfo['0'];
+				jsonItinerary['totVolume'] = this.state.ItineraryInfo['1'];
+				jsonItinerary['timeStamp'] = new Date();
+				var hash = await ipfs.add(JSON.stringify(jsonItinerary));
 
-		try {
-			var Itinerary = await AsyncStorage.getItem('Itinerary');
-			var jsonItinerary = JSON.parse(Itinerary);
-			jsonItinerary['totWeight'] = this.state.ItineraryInfo['0'];
-			jsonItinerary['totVolume'] = this.state.ItineraryInfo['1'];
-			var hash = await ipfs.add(JSON.stringify(jsonItinerary));
 
+				var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
 
-			var IpfsURL = 'https://ipfs.infura.io/ipfs/' + hash;
-
-			console.log(IpfsURL);
-		}
-		catch (error) {
-			console.log(error);
-			if (error.toString().includes("null is not an object")) {
-				Alert.alert('Error: nothing in Itinerary', 'wont store order in IPFS\nItineraryID: ' + this.state.ItineraryID);
-				var hash = 0; //
+				console.log(IpfsURL);
 			}
-			else {
-				Alert.alert('Error: IPFS Storing did not work', 'ItineraryID: ' + this.state.ItineraryID);
-				return -1;
+			catch (error) {
+				console.log(error);
+				if (error.toString().includes("null is not an object")) {
+					Alert.alert('Error: nothing in Itinerary', 'wont store order in IPFS\nItineraryID: ' + this.state.ItineraryID);
+					var hash = 0; //
+				}
+				else {
+					Alert.alert('Error: IPFS Storing did not work', 'ItineraryID: ' + this.state.ItineraryID);
+					return -1;
+				}
 			}
-		}
 
-		const data = contract.methods.loading_completed(hash).encodeABI();
-		const nonce = await web3.eth.getTransactionCount(publicKey);
-		const signedTx = await web3.eth.accounts.signTransaction(
-			{
-				nonce: nonce,
-				gasLimit: '0x200710',
-				gasPrice: '0x0A',
-				to: contract_address,
-				data: data,
-			},
-			privateKey
-		);
-		try {
-			await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-			await this.get_Itinerary_info(this.state.ItineraryID, false);
+			const data = contract.methods.loading_completed(hash).encodeABI();
+			const nonce = await web3.eth.getTransactionCount(publicKey);
+			const signedTx = await web3.eth.accounts.signTransaction(
+				{
+					nonce: nonce,
+					gasLimit: '0x200710',
+					gasPrice: '0x0A',
+					to: contract_address,
+					data: data,
+				},
+				privateKey
+			);
+			try {
+				await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+				await this.get_Itinerary_info(this.state.ItineraryID, false);
 
-			Alert.alert('Itinerary ready to go', 'Itinerary ID: ' + this.state.ItineraryID);
-			AsyncStorage.removeItem("Itinerary");
-		} catch (error) {
-			console.log(error);
-			if (error.toString().includes("Itinerary is already loaded")) {
-				Alert.alert('Error: Itinerary was already loaded', 'Itinerary ID: ' + this.state.ItineraryID);
-			}
-			else if(error.toString().includes("a trailer must be assigned")){
-				Alert.alert('Error: You need to assign a trailer', 'Itinerary ID: ' + this.state.ItineraryID);
+				Alert.alert('Itinerary ready to go', 'Itinerary ID: ' + this.state.ItineraryID);
+				AsyncStorage.removeItem("Itinerary");
+			} catch (error) {
+				console.log(error);
+				if (error.toString().includes("Itinerary is already loaded")) {
+					Alert.alert('Error: Itinerary was already loaded', 'Itinerary ID: ' + this.state.ItineraryID);
+				}
+				else if(error.toString().includes("a trailer must be assigned")){
+					Alert.alert('Error: You need to assign a trailer', 'Itinerary ID: ' + this.state.ItineraryID);
+				}
 			}
 		}
 	}
