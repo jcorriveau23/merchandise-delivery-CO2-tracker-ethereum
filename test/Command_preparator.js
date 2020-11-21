@@ -95,7 +95,7 @@ contract('Command_preparator', () => {
 		caca = await contract.init_order();
 
 		await contract.register_product("300000000000033", 3, 2);		// register product weight and volume
-		await contract.Associate_order_to_unique_product("300000000000033", 1);	// associate a traject to a specific product
+		await contract.Associate_order_to_unique_product("300000000000033", 1);	// associate a itinerary to a specific product
 		await contract.close_order("ipfs link in string");
 
 		let orderID = await contract.get_product_orderID.call("300000000000033", 1, 0);
@@ -112,7 +112,7 @@ contract('Command_preparator', () => {
 		const contract = await Command_preparator.deployed();
 		await contract.register_product("3000000000000333", 3, 2);		// register product weight and volume
 
-		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
+		for (let i=0; i<10; i++){  		// associate 10 itinerary to a specific product
 			
 			await contract.init_order();
 			await contract.Associate_order_to_unique_product("3000000000000333", 1);
@@ -122,7 +122,7 @@ contract('Command_preparator', () => {
 			console.log('added: ' + i +' => ' + order);
 		}
 
-		let order = await contract.get_product_orderID.call("3000000000000333", 1, 2);  // index 2 of traject list
+		let order = await contract.get_product_orderID.call("3000000000000333", 1, 2);  // index 2 of itinerary list
 		assert.equal(order, 4, "order was not set correctly");  // index 2 trajecst ID must equal to 4 in this case
 	});
 
@@ -154,7 +154,7 @@ contract('Command_preparator', () => {
 		const contract = await Command_preparator.deployed();
 		await contract.register_product("3000000000033333", 3, 2);		// register product weight and volume
 
-		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
+		for (let i=0; i<10; i++){  		// associate 10 itinerary to a specific product
 			
 			await contract.init_order();
 			await contract.Associate_order_to_unique_product("3000000000033333", 1);
@@ -163,7 +163,7 @@ contract('Command_preparator', () => {
 			console.log('added: ' + i +' => ' + order);
 		}
 
-		let size = await contract.get_product_orders_size.call("3000000000033333", 1);  // index 2 of traject list
+		let size = await contract.get_product_orders_size.call("3000000000033333", 1);  // index 2 of itinerary list
 		assert.equal(size, 10, "the size of the product's order list does not correspond");  // index 2 trajecst ID must equal to 2 in this case
 	});
 
@@ -240,7 +240,7 @@ contract('Command_preparator', () => {
 
 		var itineraryIDTrailer = -1
 
-		await contract.Associate_trailer_to_itinerary(666);					// add trailer to traject
+		await contract.Associate_trailer_to_itinerary(666);					// add trailer to itinerary
 		await contract.loading_completed("ipfs link in string"); // close itinerary as loading attendant
 
 		var itineraryID = await contract.get_current_ItineraryID()
@@ -340,7 +340,7 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 19
-	it("a trucker can start a traject, by sending the CO2Counter truck Counter value and truckID", async () => {
+	it("a trucker can start a itinerary, by sending the CO2Counter truck Counter value and truckID", async () => {
 		const contract = await Command_preparator.deployed();
 
 		itineraryID = await contract.get_trucker_current_ItineraryID();
@@ -403,7 +403,7 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 22
-	it("a trucker can end a traject by sending the CO2Counter truck Counter value and truckID", async () => {
+	it("a trucker can end a itinerary by sending the CO2Counter truck Counter value and truckID", async () => {
 		const contract = await Command_preparator.deployed();
 
 		var itineraryID = await contract.get_trucker_current_ItineraryID();

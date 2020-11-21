@@ -20,7 +20,6 @@ contract Command_preparator{
     }
 
     struct UPC {                                // store the weight and volume of a specific product (UPC)
-        string UPC;// could be deleted
         uint Weight;        
         uint Volume;
         mapping(uint => Product) uniqueProduct; // mapping all unique instantiation of the product
@@ -54,12 +53,11 @@ contract Command_preparator{
 
     struct Itinerary {
         uint[] TrailerIDs;  // dynamic list of trailerID (some truc can carry more than one trailer)
-        uint8 nbTrailers;    //
+        uint8 nbTrailers;
         uint truckID;       // truck that drive the Itinerary
         uint totWeight;     // total weight of the Itinerary = sums of orders total weight
         uint totVolume;     // total volume of the Itinerary = sums of orders total volume
-        // uint fromID;
-        // uint toID;
+
         bool loaded;         // true when the Itinerary is fully charged
         bool started;          // true when the Itinerary is done => co2Emission is valid
         bool done;          // true when the Itinerary is done => co2Emission is valid
@@ -93,7 +91,7 @@ contract Command_preparator{
         return D.upcs[D.UpcToIndex[_upc].ID].Volume;
     }
 
-    // New_product
+    // register_product
     // description: register a new product (same UPC can't be registered twice)
     // input: _UPC, _weight, _volume of the new product
     // output:
@@ -107,7 +105,6 @@ contract Command_preparator{
         
 
         UPC memory newUPC;
-        newUPC.UPC = _upc;
         newUPC.Weight = _weight;
         newUPC.Volume = _volume;
         newUPC.numberProduct = 0;
@@ -116,14 +113,14 @@ contract Command_preparator{
         return 1;
     }
 
-    // new_order
+    // init_order
     // description: create a new order and return the ID of the order
     // input: N/A
     // return: ID of the order (index in the orders array)
     function init_order() public returns(uint orderID){
         
         uint _orderID = D.openOrderID[msg.sender];
-        if(_orderID < D.numOrders){   
+        if(_orderID < D.numOrders){   // 
             require(D.orders[_orderID].done == true, "already have an open Order");  
         }
         
@@ -141,10 +138,10 @@ contract Command_preparator{
         return (D.numOrders - 1);  // return the index (orderID) of this new order
     }
 
-    // Associate_order
+    // Associate_order_to_unique_product
     // description: add to a unique product's orderIDs list, a new order
-    // input:
-    // return:
+    // input: UPC and unique code of the product
+    // return: 1 if sucess
     function Associate_order_to_unique_product(string memory _upc, uint _unique) public returns(uint) {
         
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
@@ -209,16 +206,15 @@ contract Command_preparator{
         return (D.orders[_orderID].totWeight, D.orders[_orderID].totVolume, D.orders[_orderID].done, D.orders[_orderID].ipfsOrderHash);
     }
 
-     // get_order_info
-    // description: return the info of a order
-    // input: _orderID
-    // return: total weight of the order, total volume of the order and if the order is done or not
+     // get_current_order_id
+    // description: return the current orderID of a user (orderPicker)
+    // input: N/A
+    // return: orderID of the user
     function get_current_order_id() public view returns(uint){
-
         return D.openOrderID[msg.sender];
     }
 
-    // order_completed
+    // close_order
     // description: set the order completed on the blockchain, it can now be store in an Itinerary
     // input: _orderID
     // return: 
@@ -253,7 +249,7 @@ contract Command_preparator{
         return D.orders[_orderID].ItineraryIDs[_index];
     }
     
-    // new_Itinerary
+    // init_itinerary
     // description: create a new Itinerary
     // input: N/A
     // return: the ItineraryID of the new Itinerary (index of the Itineraries list)
@@ -281,10 +277,18 @@ contract Command_preparator{
         return (D.numItineraries - 1);
     }
 
+    // get_current_ItineraryID
+    // description: return the current itineraryID of a user (Loading attendant)
+    // input: N/A
+    // return: itineraryID of the user
     function get_current_ItineraryID() public view returns(uint){
         return D.LoadingAttendantOpenItineraryID[msg.sender];
     }
 
+    // loading_completed
+    // description: Mark the itinerary as loaded 
+    // input: IPFS hash of the itinerary content
+    // return: N/A
     function loading_completed(string memory _IpfsItineraryHash) public returns(bool){
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         require(D.Itineraries[_ItineraryID].loaded == false, "Itinerary is already loaded");
@@ -295,10 +299,10 @@ contract Command_preparator{
         D.Itineraries[_ItineraryID].ipfsItineraryHash = _IpfsItineraryHash;
     }
     
-    // Associate_Itinerary
-    // description: add a order to an Itinerary
-    // input: ID of a order and ID of the Itinerary
-    // return: 
+    // Associate_itinerary_to_order
+    // description: add the itineraryID value into an order Struct
+    // input: orderID that we want to add to this itinerary
+    // return: N/A
     function Associate_itinerary_to_order(uint _orderID) public returns(bool) {
         
         require(_orderID < D.numOrders, "this Order does not exist");
@@ -325,10 +329,10 @@ contract Command_preparator{
         return true;
      }
      
-    // associate_trailer
-    // description: add a trailers ID to the Itineraries (a truck transport multiple trailers)
+    // Associate_trailer_to_itinerary
+    // description: add a trailers ID to the user current Itinerary (a truck can transport multiple trailers)
     // input: ID of a order and ID of the Itinerary
-    // return:      
+    // return: N/A
     function Associate_trailer_to_itinerary(uint _trailerID) public returns(bool) {
         uint _ItineraryID = D.LoadingAttendantOpenItineraryID[msg.sender];
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
@@ -344,21 +348,37 @@ contract Command_preparator{
         D.TrailerCurrentItinerary[_trailerID].currentItineraryID = _ItineraryID;
     }
     
+    // get_Itinerary_info
+    // description: get the information of an itineraryID
+    // input: ID of an itinerary
+    // return: totWeight, totVolume, co2Emissions, loaded, started, done, IPFS Hash
     function get_Itinerary_info(uint _ItineraryID) public view returns(uint, uint, uint, bool, bool, bool, string memory){
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
 
         return (D.Itineraries[_ItineraryID].totWeight, D.Itineraries[_ItineraryID].totVolume, D.Itineraries[_ItineraryID].co2Emission, D.Itineraries[_ItineraryID].loaded, D.Itineraries[_ItineraryID].started, D.Itineraries[_ItineraryID].done, D.Itineraries[_ItineraryID].ipfsItineraryHash);
     }
     
+    // get_trailer_current_Itinerary
+    // description: get a trailerID, his current itineraryID
+    // input: ID of a trailer
+    // return: itineraryID associated to the trailer
     function get_trailer_current_Itinerary(uint _trailerID) public view returns(uint){
         require(D.TrailerCurrentItinerary[_trailerID].isValue == true, "trailer does not exist");
         return D.TrailerCurrentItinerary[_trailerID].currentItineraryID;
     }
-    
+
+    // get_trucker_current_ItineraryID
+    // description: get the current itinerary of a user (trucker)
+    // input: N/A
+    // return: ID of the current itinerary of the user    
     function get_trucker_current_ItineraryID() public view returns(uint){
         return D.TruckerOpenItineraryID[msg.sender];
     }
-    
+
+    // grab_Itinerary
+    // description: grab a loaded itinerary for a user (Trucker)
+    // input: ID of the itinerary
+    // return: N/A     
     function grab_Itinerary(uint _ItineraryID) public returns(bool){
         
         
@@ -373,6 +393,10 @@ contract Command_preparator{
         D.TruckerOpenItineraryID[msg.sender] = _ItineraryID;
     }    
 
+    // Itinerary_start
+    // description: mark the user itinerary as started and store the CO2 truck count into the itinerary
+    // input: CO2 value of the truck CO2 counter and the ID of the truck
+    // return: N/A   
     function Itinerary_start(uint _CO2Counter, uint _truckID) public returns(bool){
         uint _ItineraryID = D.TruckerOpenItineraryID[msg.sender];
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
@@ -385,6 +409,10 @@ contract Command_preparator{
         
     }
 
+    // Itinerary_stop
+    // description: mark the user itinerary as ended and store the differance between the end and the start CO2 value into the itinerary
+    // input: CO2 value of the truck CO2 counter and the ID of the truck
+    // return: N/A  
     function Itinerary_stop(uint _CO2Counter, uint _truckID) public returns(bool){
         uint _ItineraryID = D.TruckerOpenItineraryID[msg.sender];
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
@@ -396,14 +424,22 @@ contract Command_preparator{
         D.Itineraries[_ItineraryID].done = true;
         D.Itineraries[_ItineraryID].co2Emission = _CO2Counter - D.Itineraries[_ItineraryID].co2Emission;
     }
-    
+
+    // get_Itinerary_emission
+    // description: return the total emission of an ended itinerary
+    // input: ID of a completed itinerary
+    // return: CO2 emissions of the itinerary     
     function get_Itinerary_emission(uint _ItineraryID) public view returns (uint){
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
         require(D.Itineraries[_ItineraryID].done == true, "this is not completed");
         
         return D.Itineraries[_ItineraryID].co2Emission;
     }
-    
+
+    // get_product_emission
+    // description: return products emission's part in an itinerary
+    // input: UPC of a product, and ID of an itinerary it has been part of
+    // return: its part bases on the formula in the doc  
     function get_product_emission(string memory _upc, uint _ItineraryID) public view returns (uint){
         require(_ItineraryID < D.numItineraries, 'this Itinerary does not exist');
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
