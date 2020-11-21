@@ -19,7 +19,7 @@ contract('Command_preparator', () => {
 	// Test 2
 	it('A product weight and volume can be registered', async () => {
 		const contract = await Command_preparator.deployed();
-		await contract.New_product("10000000000001", 3, 2);
+		await contract.register_product("10000000000001", 3, 2);
 
 		let weight = await contract.get_upc_weight.call("10000000000001");
 		assert.equal(weight, 3, "the weight has been registered correctly");
@@ -33,8 +33,8 @@ contract('Command_preparator', () => {
 	it('Cant registered a duplicate UPC to the chain', async () => {
 		const contract = await Command_preparator.deployed();
 		try {
-			await contract.New_product("10000000000001", 3, 2);
-			await contract.New_product("10000000000001", 3, 2); // duplicate call an error should occur on the console
+			await contract.register_product("10000000000001", 3, 2);
+			await contract.register_product("10000000000001", 3, 2); // duplicate call an error should occur on the console
 		}
 		catch(e){
 			console.log('error: ' + e.reason) // print the error
@@ -45,14 +45,14 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 4
-	it("a command can be initiated by a loading attendant", async () => {
+	it("a order can be initiated by a loading attendant", async () => {
 		const contract = await Command_preparator.deployed();
 		orderID = -1;
 
-		await contract.new_command();
-		var orderID = await contract.get_current_command_id();
+		await contract.init_order();
+		var orderID = await contract.get_current_order_id();
 		console.log('order created ID: ' + orderID) // print the error
-		assert.equal(orderID, 0, "could not initiate the first command of the contract")
+		assert.equal(orderID, 0, "could not initiate the first order of the contract")
 	});
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -61,11 +61,11 @@ contract('Command_preparator', () => {
 	it("can't open 2 itinerary at the same time", async () => {
 		const contract = await Command_preparator.deployed();
 		try{
-			await contract.new_command();
+			await contract.init_order();
 		}
 		catch(e){
 			console.log('error: ' + e.reason) // print the error
-			assert.equal(e.reason, "already have an open command", "user cant open a new order if already have one not close");
+			assert.equal(e.reason, "already have an open Order", "user cant open a new order if already have one not close");
 		}
 		
 	});
@@ -73,34 +73,34 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 6
-	it('Cant add a command to a not registered product', async () => {
+	it('Cant add a order to a not registered product', async () => {
 		const contract = await Command_preparator.deployed();
 		try {
 			
-			await contract.Associate_Command("30000000000003", 3);  // the product was not registered an error should occur on the console
+			await contract.Associate_order_to_unique_product("30000000000003", 3);  // the product was not registered an error should occur on the console
 		}
 		catch(e){
 			console.log('error: ' + e.reason) // print the error
-			assert.equal(e.reason, "must be a product registered", "added a command to a product not registered...");
+			assert.equal(e.reason, "must be a product registered", "added a order to a product not registered...");
 		}
-		await contract.command_completed("ipfs link in string");
+		await contract.close_order("ipfs link in string");
 	});
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 7
-	it('A command can be add to a registered product', async () => {
+	it('A order can be add to a registered product', async () => {
 		const contract = await Command_preparator.deployed();
 		
-		caca = await contract.new_command();
+		caca = await contract.init_order();
 
-		await contract.New_product("300000000000033", 3, 2);		// register product weight and volume
-		await contract.Associate_Command("300000000000033", 1);	// associate a traject to a specific product
-		await contract.command_completed("ipfs link in string");
+		await contract.register_product("300000000000033", 3, 2);		// register product weight and volume
+		await contract.Associate_order_to_unique_product("300000000000033", 1);	// associate a traject to a specific product
+		await contract.close_order("ipfs link in string");
 
-		let commandID = await contract.get_product_commandID.call("300000000000033", 1, 0);
-		console.log('command ID added: ' + commandID);
-		assert.equal(commandID, 1, "commandID was not set correctly");
+		let orderID = await contract.get_product_orderID.call("300000000000033", 1, 0);
+		console.log('order ID added: ' + orderID);
+		assert.equal(orderID, 1, "orderID was not set correctly");
 
 		
 	});
@@ -108,38 +108,38 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 8
-	it('multiple commands can be assign to a registered product', async () => {
+	it('multiple orders can be assign to a registered product', async () => {
 		const contract = await Command_preparator.deployed();
-		await contract.New_product("3000000000000333", 3, 2);		// register product weight and volume
+		await contract.register_product("3000000000000333", 3, 2);		// register product weight and volume
 
 		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
 			
-			await contract.new_command();
-			await contract.Associate_Command("3000000000000333", 1);
-			await contract.command_completed("ipfs link in string");
+			await contract.init_order();
+			await contract.Associate_order_to_unique_product("3000000000000333", 1);
+			await contract.close_order("ipfs link in string");
 
-			let command = await contract.get_product_commandID.call("3000000000000333", 1, i); // index i of commandIDs list
-			console.log('added: ' + i +' => ' + command);
+			let order = await contract.get_product_orderID.call("3000000000000333", 1, i); // index i of orderIDs list
+			console.log('added: ' + i +' => ' + order);
 		}
 
-		let command = await contract.get_product_commandID.call("3000000000000333", 1, 2);  // index 2 of traject list
-		assert.equal(command, 4, "command was not set correctly");  // index 2 trajecst ID must equal to 4 in this case
+		let order = await contract.get_product_orderID.call("3000000000000333", 1, 2);  // index 2 of traject list
+		assert.equal(order, 4, "order was not set correctly");  // index 2 trajecst ID must equal to 4 in this case
 	});
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 9
-	it('revert when trying to view a commandID with index greater than commandIDs list size', async () => {
+	it('revert when trying to view a orderID with index greater than orderIDs list size', async () => {
 		const contract = await Command_preparator.deployed();
-		await contract.New_product("30000000000003333", 3, 2);		// register product weight and volume
+		await contract.register_product("30000000000003333", 3, 2);		// register product weight and volume
 		
-		await contract.new_command();
+		await contract.init_order();
 		
-		await contract.Associate_Command("30000000000003333", 3);
-		await contract.command_completed("ipfs link in string");
+		await contract.Associate_order_to_unique_product("30000000000003333", 3);
+		await contract.close_order("ipfs link in string");
 
 		try{
-			await contract.get_product_commandID.call('30000000000003333', 3, 4)  // should be reverted 
+			await contract.get_product_orderID.call('30000000000003333', 3, 4)  // should be reverted 
 		}
 		catch(e){
 			assert.equal(e.toString().includes("index out of bound"), true, "an error should have occured: index out of bound");
@@ -150,35 +150,35 @@ contract('Command_preparator', () => {
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 10
-	it('can get the lenght of a product command list', async () => {
+	it('can get the lenght of a product order list', async () => {
 		const contract = await Command_preparator.deployed();
-		await contract.New_product("3000000000033333", 3, 2);		// register product weight and volume
+		await contract.register_product("3000000000033333", 3, 2);		// register product weight and volume
 
 		for (let i=0; i<10; i++){  		// associate 10 traject to a specific product
 			
-			await contract.new_command();
-			await contract.Associate_Command("3000000000033333", 1);
-			await contract.command_completed("ipfs link in string");
-			let command = await contract.get_product_commandID.call("3000000000033333", 1, i); // index i of commandIDs list
-			console.log('added: ' + i +' => ' + command);
+			await contract.init_order();
+			await contract.Associate_order_to_unique_product("3000000000033333", 1);
+			await contract.close_order("ipfs link in string");
+			let order = await contract.get_product_orderID.call("3000000000033333", 1, i); // index i of orderIDs list
+			console.log('added: ' + i +' => ' + order);
 		}
 
-		let size = await contract.get_product_commands_size.call("3000000000033333", 1);  // index 2 of traject list
-		assert.equal(size, 10, "the size of the product's command list does not correspond");  // index 2 trajecst ID must equal to 2 in this case
+		let size = await contract.get_product_orders_size.call("3000000000033333", 1);  // index 2 of traject list
+		assert.equal(size, 10, "the size of the product's order list does not correspond");  // index 2 trajecst ID must equal to 2 in this case
 	});
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Test 11
-	it('validate that a command weight and volume cummulate with adding product', async () => {
+	it('validate that a order weight and volume cummulate with adding product', async () => {
 		const contract = await Command_preparator.deployed();
 
-		currentCommand = await contract.get_current_command_id();
-		console.log("current order: " + currentCommand)
+		currentOrder = await contract.get_current_order_id();
+		console.log("current order: " + currentOrder)
 		
-		let info = await contract.get_command_info(currentCommand);
+		let info = await contract.get_order_info(currentOrder);
 
-		console.log("order ID: " + currentCommand)
+		console.log("order ID: " + currentOrder)
 		console.log("tot Weight: " + info[0]['words'][0])
 		console.log("tot Volume: " +info[1]['words'][0])
 
@@ -195,7 +195,7 @@ contract('Command_preparator', () => {
 		const contract = await Command_preparator.deployed();
 		itineraryID = 8;
 
-		await contract.new_Itinerary();
+		await contract.init_itinerary();
 		itineraryID = await contract.get_trucker_current_ItineraryID()
 
 		console.log("current itinerary: " + itineraryID)
@@ -208,7 +208,7 @@ contract('Command_preparator', () => {
 	it("can't open 2 itinerary at the same time", async () => {
 		const contract = await Command_preparator.deployed();
 		try{
-			await contract.new_Itinerary();
+			await contract.init_itinerary();
 		}
 		catch(e){
 			console.log('error: ' + e.reason) // print the error
@@ -240,7 +240,7 @@ contract('Command_preparator', () => {
 
 		var itineraryIDTrailer = -1
 
-		await contract.associate_trailer(666);					// add trailer to traject
+		await contract.Associate_trailer_to_itinerary(666);					// add trailer to traject
 		await contract.loading_completed("ipfs link in string"); // close itinerary as loading attendant
 
 		var itineraryID = await contract.get_current_ItineraryID()
@@ -260,11 +260,11 @@ contract('Command_preparator', () => {
 	it("can add orders to itinerary", async () => {
 		const contract = await Command_preparator.deployed();
 
-		await contract.new_Itinerary();
+		await contract.init_itinerary();
 
 		itineraryID = await contract.get_current_ItineraryID()
 		console.log("current itinerary: " + itineraryID)
-		await contract.Associate_Itinerary(22);
+		await contract.Associate_itinerary_to_order(22);
 
 		itineraryInfo = await contract.get_Itinerary_info(itineraryID);
 		console.log("current Loading attendant Itinerary ID: " + itineraryID)
@@ -275,8 +275,8 @@ contract('Command_preparator', () => {
 		assert.equal(itineraryInfo[1]['words'][0], 2, "could not add order 22 to open itinerary")
 
 
-		itineraryListSize = await contract.get_command_Itinerary_list_size(22);
-		itineraryID = await contract.get_command_Itinerary_list_index(22, 0)
+		itineraryListSize = await contract.get_order_Itinerary_list_size(22);
+		itineraryID = await contract.get_order_Itinerary_list_index(22, 0)
 		
 		console.log("Order 22 => itinerary list size: " + itineraryListSize)
 		console.log("Order 22 => itinerary ID : " + itineraryID)
@@ -284,7 +284,8 @@ contract('Command_preparator', () => {
 		assert.equal(itineraryListSize, 1, "itinerary not added to order")
 		assert.equal(itineraryID, 1, "not the right itinerary added to the order")
 
-		await contract.associate_trailer(666)
+		await contract.Associate_trailer_to_itinerary(6666)
+
 		await contract.loading_completed("ipfs link in string")
 
 	});
@@ -297,15 +298,15 @@ contract('Command_preparator', () => {
 		var totWeight = 0;
 		var totVolume = 0;
 
-		await contract.new_Itinerary();
+		await contract.init_itinerary();
 
 		itineraryID = await contract.get_current_ItineraryID();
 		console.log("current itinerary: " + itineraryID);
 
 		for (i = 0; i < 22; i++){
-			await contract.Associate_Itinerary(i);
+			await contract.Associate_itinerary_to_order(i);
 			console.log("added itinerary: " + i)
-			orderInfo = await contract.get_command_info(i)
+			orderInfo = await contract.get_order_info(i)
 
 			totWeight += orderInfo[0]['words'][0]
 			totVolume += orderInfo[1]['words'][0]
@@ -318,7 +319,7 @@ contract('Command_preparator', () => {
 		assert.equal(totWeight, itineraryInfo[0]['words'][0], "Weight cumulated is not the same")
 		assert.equal(totVolume, itineraryInfo[1]['words'][0], "Volume cumulated is not the same")
 
-		await contract.associate_trailer(666)
+		await contract.Associate_trailer_to_itinerary(66666)
 		await contract.loading_completed("ipfs link in string")
 	});
 
@@ -349,7 +350,6 @@ contract('Command_preparator', () => {
 		await contract.Itinerary_start(CO2Counter, truckID)
 
 		itineraryInfo = await contract.get_Itinerary_info(itineraryID)
-		itineraryIDTrailer = await contract.get_trailer_current_Itinerary(999);
 
 		console.log("itinerary ID: " + itineraryID + "started")
 		console.log("CO2 counter value: " + itineraryInfo[2]['words'][0])
@@ -437,16 +437,16 @@ contract('Command_preparator', () => {
 		var ProductVolume = 2
 		var itineraryID = -1
 		
-		orderListSize = await contract.get_product_commands_size(UPC, Unique)
+		orderListSize = await contract.get_product_orders_size(UPC, Unique)
 
 		for(i = 0; i < orderListSize; i++){
-			orderID = await contract.get_product_commandID(UPC, Unique, i)
+			orderID = await contract.get_product_orderID(UPC, Unique, i)
 			console.log("participated in orderID: " + orderID)
 
-			itineraryListSize = await contract.get_command_Itinerary_list_size(orderID);
+			itineraryListSize = await contract.get_order_Itinerary_list_size(orderID);
 
 			for(j=0; j < itineraryListSize; j++){
-				itineraryID = await contract.get_command_Itinerary_list_index(orderID, j)
+				itineraryID = await contract.get_order_Itinerary_list_index(orderID, j)
 				console.log("participated in itineraryID: " + itineraryID);
 
 				itineraryInfo = await contract.get_Itinerary_info(itineraryID)

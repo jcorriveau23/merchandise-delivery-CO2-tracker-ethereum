@@ -145,7 +145,7 @@ contract Command_preparator{
     // description: add to a unique product's orderIDs list, a new order
     // input:
     // return:
-     function Associate_order_to_unique_product(string memory _upc, uint _unique) public returns(uint) {
+    function Associate_order_to_unique_product(string memory _upc, uint _unique) public returns(uint) {
         
         require(D.UpcToIndex[_upc].isValue == true, 'must be a product registered');
         
@@ -299,7 +299,7 @@ contract Command_preparator{
     // description: add a order to an Itinerary
     // input: ID of a order and ID of the Itinerary
     // return: 
-     function Associate_itinerary_to_order(uint _orderID) public returns(bool) {
+    function Associate_itinerary_to_order(uint _orderID) public returns(bool) {
         
         require(_orderID < D.numOrders, "this Order does not exist");
         require(D.orders[_orderID].done == true, "this Order is not completed");
