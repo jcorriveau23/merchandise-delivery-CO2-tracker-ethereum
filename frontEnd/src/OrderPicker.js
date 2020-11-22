@@ -10,11 +10,11 @@ import HDWalletProvider from 'truffle-hdwallet-provider';
 const IPFS = require('ipfs-mini');
 const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" });
 
-const mnemonic = $abi.mnemonic
 const abi = $abi.abi
 const contract_address = $abi.contract_address
-const publicKey = $abi.publicKey
-const privateKey = $abi.privateKey
+const mnemonic = $abi.mnemonic_OP
+const publicKey = $abi.publicKey_OP
+const privateKey = $abi.privateKey_OP
 const infuraAPI = $abi.Infura_api
 
 const Provider = new HDWalletProvider(mnemonic, infuraAPI);

@@ -5,11 +5,11 @@ import './shim';
 
 const $abi = require('./ABI_and_keys')
 
-const mnemonic = $abi.mnemonic
+const mnemonic = $abi.mnemonic_T
 const abi = $abi.abi
 const contract_address = $abi.contract_address
-const publicKey = $abi.publicKey
-const privateKey = $abi.privateKey
+const publicKey = $abi.publicKey_T
+const privateKey = $abi.privateKey_T
 const infuraAPI = $abi.Infura_api
 
 const Web3 = require('web3');

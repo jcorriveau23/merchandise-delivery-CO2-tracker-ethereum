@@ -4,11 +4,11 @@ import { NavigationEvents } from "react-navigation";
 import './shim';
 const $abi = require('./ABI_and_keys')
 
-const mnemonic = $abi.mnemonic
+const mnemonic = $abi.mnemonic_T
 const abi = $abi.abi
 const contract_address = $abi.contract_address
 const infuraAPI = $abi.Infura_api
-const publicKey = $abi.publicKey
+const publicKey = $abi.publicKey_T
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;

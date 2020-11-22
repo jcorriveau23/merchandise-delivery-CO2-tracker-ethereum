@@ -606,9 +606,21 @@ module.exports = {
             "type": "function"
         }
     ],
-    contract_address : '0xEC807e4a8EB677d448673059a2bB215349Dc868d',
-    
-    mnemonic : 'brand stool practice soccer air stairs cattle guide cluster crater solar humor',
-    privateKey : '16025735fb794cf9b882507255fb8f6749517ba40e1334ef216db0057036febd',
-    publicKey : '0x9eFD2305580Dc5E450306BC0b5b5C14b591EA437',
+    contract_address : '0x42d252C728739DF6ba95F739ff9C1AD4DF006Df2',
+    Infura_api: 'https://kovan.infura.io/v3/64cb42b562044403aeb899e757921511',
+
+    //Order Picker Keys
+    mnemonic_OP : 'your Order Picker hdwallet mnemonic',
+    privateKey_OP : 'your Order Picker private key',
+    publicKey_OP : 'your Order Picker public key',
+
+    //Loading attendant Keys
+    mnemonic_LA : 'your Loading attendant hdwallet mnemonic',
+    privateKey_LA : 'your Loading attendant private key',
+    publicKey_LA : 'your Order Picker public key',
+
+    //Trucker Keys
+    mnemonic_T : 'your Trucker hdwallet mnemonic',
+    privateKey_T : 'your Trucker private key',
+    publicKey_T : 'your Trucker public key',
 } 

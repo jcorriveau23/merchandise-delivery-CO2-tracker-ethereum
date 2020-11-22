@@ -8,11 +8,11 @@ const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
 const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" });
 
-const mnemonic = $abi.mnemonic
 const abi = $abi.abi
 const contract_address = $abi.contract_address
-const publicKey = $abi.publicKey
-const privateKey = $abi.privateKey
+const mnemonic = $abi.mnemonic_LA
+const publicKey = $abi.publicKey_LA
+const privateKey = $abi.privateKey_LA
 const infuraAPI = $abi.Infura_api
 
 const Tx = require('ethereumjs-tx').Transaction;

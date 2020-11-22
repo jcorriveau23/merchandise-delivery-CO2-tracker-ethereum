@@ -7,7 +7,7 @@ import Container from './Container';
 
 const $abi = require('./ABI_and_keys')
 
-const mnemonic = $abi.mnemonic
+const mnemonic = $abi.mnemonic_OP
 const abi = $abi.abi
 const contract_address = $abi.contract_address
 const infuraAPI = $abi.Infura_api
