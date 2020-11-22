@@ -13,6 +13,9 @@ https://kovan.etherscan.io/address/0x42d252C728739DF6ba95F739ff9C1AD4DF006Df2
 
 Now you should be able to participated in the contract, you can use QR codes located in root/QrCodes or make your own products
 
+See demo of how to use the app:
+https://www.youtube.com/watch?v=TZ-BCY8ahPA&t=240s
+
 # CO2_Merchandise_Transportation_Tracker
 
 Proof of concept of DAPP on Ethereum that track carbon footprint of merchandise transportation.
