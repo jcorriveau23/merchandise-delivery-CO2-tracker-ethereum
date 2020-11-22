@@ -6,7 +6,6 @@ const $abi = require('./ABI_and_keys')
 
 const Web3 = require('web3');
 import HDWalletProvider from 'truffle-hdwallet-provider';
-const Tx = require('ethereumjs-tx').Transaction;
 
 const IPFS = require('ipfs-mini');
 const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" });
@@ -16,11 +15,12 @@ const abi = $abi.abi
 const contract_address = $abi.contract_address
 const publicKey = $abi.publicKey
 const privateKey = $abi.privateKey
+const infuraAPI = $abi.Infura_api
 
-const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
+const Provider = new HDWalletProvider(mnemonic, infuraAPI);
 const web3 = new Web3(Provider);
-const contract = new web3.eth.Contract(abi, contract_address);
-
+const contract = new web3.eth.Contract(abi, contract_address, {from: publicKey});
+web3.eth.defaultAccount = publicKey;
 
 const Separator = () => (
 	<View style={styles.separator} />
@@ -103,6 +103,7 @@ export default class OrderPicker extends Component {
 
 	async componentDidMount() {
 		var orderID = await contract.methods.get_current_order_id().call();
+		console.log(orderID)
 		await this.get_order_info(orderID, false);
 		//this.setState({orderInfo: orderInfo});
 		this.setState({ orderID: orderID });
@@ -114,11 +115,14 @@ export default class OrderPicker extends Component {
 
 		const data = contract.methods.init_order().encodeABI();
 		const nonce = await web3.eth.getTransactionCount(publicKey);
+		var gasPrice = await web3.eth.getGasPrice();
+		var gasLimit = await web3.eth.getBlock("latest", false);
+	
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
 				nonce: nonce,
-				gasLimit: '0x200710',
-				gasPrice: '0x0A',
+				gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+				gasPrice: '0x' + parseInt(gasPrice).toString(16),
 				to: contract_address,
 				data: data,
 			},
@@ -128,7 +132,6 @@ export default class OrderPicker extends Component {
 		if(resolve = "YES"){
 			try {
 				await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
 				var neworderID = await contract.methods.get_current_order_id().call();
 				this.setState({ orderID: neworderID });
 				this.setState({ IpfsURL: "" })
@@ -136,8 +139,11 @@ export default class OrderPicker extends Component {
 
 				Alert.alert('Order created', 'Order ID: ' + this.state.orderID);
 			} catch (error) {
-				if (error.toString().includes("already have an open order")) {
+				if (error.toString().includes("already have an open Order")) {
 					Alert.alert('Error: user already have an open order', 'open orderID: ' + this.state.orderID);
+				}
+				else{
+					Alert.alert("Error:", error.toString())
 				}
 			}
 		}
@@ -173,11 +179,14 @@ export default class OrderPicker extends Component {
 
 			const data = contract.methods.close_order(hash).encodeABI();  // send (32 + 2) bytes ipfs hash
 			const nonce = await web3.eth.getTransactionCount(publicKey);
+			var gasPrice = await web3.eth.getGasPrice();
+			var gasLimit = await web3.eth.getBlock("latest", false);
+		
 			const signedTx = await web3.eth.accounts.signTransaction(
 				{
 					nonce: nonce,
-					gasLimit: '0x200710',
-					gasPrice: '0x0A',
+					gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+					gasPrice: '0x' + parseInt(gasPrice).toString(16),
 					to: contract_address,
 					data: data,
 				},
@@ -203,6 +212,7 @@ export default class OrderPicker extends Component {
 		console.log('get_order_info');
 		try {
 			var orderInfo = await contract.methods.get_order_info(orderID).call();
+			console.log(orderInfo);
 			this.setState({ orderInfo: orderInfo });
 			if (alert == true) {
 				Alert.alert('Order info', 'Order ID: ' + orderID + '\nTotal weight: ' + orderInfo['0'] + '\nTotal volume: ' + orderInfo['1'] + '\nDone: ' + orderInfo['2']);

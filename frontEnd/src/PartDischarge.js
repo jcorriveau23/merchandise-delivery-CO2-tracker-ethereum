@@ -10,18 +10,18 @@ const abi = $abi.abi
 const contract_address = $abi.contract_address
 const publicKey = $abi.publicKey
 const privateKey = $abi.privateKey
+const infuraAPI = $abi.Infura_api
 
 const Web3 = require('web3');
 const IPFS = require('ipfs-mini');
 const ipfs = new IPFS({ host: "ipfs.infura.io", port: 5001, protocol: "https" });
-
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
 
-const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
+const Provider = new HDWalletProvider(mnemonic, infuraAPI);
 const web3 = new Web3(Provider);
-const contract = new web3.eth.Contract(abi, contract_address);
-
+const contract = new web3.eth.Contract(abi, contract_address, {from: publicKey});
+web3.eth.defaultAccount = publicKey;
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -104,11 +104,14 @@ export default class PartDischarge extends Component {
 
         const data = contract.methods.init_itinerary().encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
+        var gasPrice = await web3.eth.getGasPrice();
+        var gasLimit = await web3.eth.getBlock("latest", false);
+    
         const signedTx = await web3.eth.accounts.signTransaction(
             {
                 nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
+                gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+                gasPrice: '0x' + parseInt(gasPrice).toString(16),
                 to: contract_address,
                 data: data,
             },
@@ -125,6 +128,9 @@ export default class PartDischarge extends Component {
             if (error.toString().includes("already have an open Itinerary")) {
                 Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
             }
+            else{
+                Alert.alert("Error:", error.toString())
+            }
             return false;
         }
     }
@@ -132,11 +138,14 @@ export default class PartDischarge extends Component {
 
         const data = contract.methods.Associate_itinerary_to_order(orderID).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
+        var gasPrice = await web3.eth.getGasPrice();
+        var gasLimit = await web3.eth.getBlock("latest", false);
+    
         const signedTx = await web3.eth.accounts.signTransaction(
             {
                 nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
+                gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+                gasPrice: '0x' + parseInt(gasPrice).toString(16),
                 to: contract_address,
                 data: data,
             },
@@ -148,7 +157,6 @@ export default class PartDischarge extends Component {
             return true;
 
         } catch (error) {
-            console.log(error);
             Alert.alert('something went wrong', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
             return false;
         }
@@ -158,11 +166,14 @@ export default class PartDischarge extends Component {
 
         const data = contract.methods.Associate_trailer_to_itinerary(trailerID).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
+        var gasPrice = await web3.eth.getGasPrice();
+        var gasLimit = await web3.eth.getBlock("latest", false);
+    
         const signedTx = await web3.eth.accounts.signTransaction(
             {
                 nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
+                gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+                gasPrice: '0x' + parseInt(gasPrice).toString(16),
                 to: contract_address,
                 data: data,
             },
@@ -174,7 +185,6 @@ export default class PartDischarge extends Component {
             return true;
 
         } catch (error) {
-            console.log(error);
             Alert.alert('Error', 'could not added trailerID to Itinerary\n' + "trailer ID: " + trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
             return false;
         }
@@ -207,11 +217,14 @@ export default class PartDischarge extends Component {
 
         const data = contract.methods.loading_completed(hash).encodeABI();
         const nonce = await web3.eth.getTransactionCount(publicKey);
+        var gasPrice = await web3.eth.getGasPrice();
+        var gasLimit = await web3.eth.getBlock("latest", false);
+    
         const signedTx = await web3.eth.accounts.signTransaction(
             {
                 nonce: nonce,
-                gasLimit: '0x200710',
-                gasPrice: '0x0A',
+                gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+                gasPrice: '0x' + parseInt(gasPrice).toString(16),
                 to: contract_address,
                 data: data,
             },
@@ -227,6 +240,9 @@ export default class PartDischarge extends Component {
         } catch (error) {
             if (error.toString().includes("Itinerary is already loaded")) {
                 Alert.alert('Error: Itinerary was already loaded', 'Itinerary ID: ' + this.state.ItineraryID);
+            }
+            else{
+                Alert.alert("Error:", error.toString())
             }
             return false;
         }
@@ -245,7 +261,6 @@ export default class PartDischarge extends Component {
             valid = await this.init_Itinerary();
             if (valid == true) {
 
-
                 var i = 0;
                 for (i; i < this.state.orderList.length; i++) {
                     valid == false;
@@ -261,7 +276,6 @@ export default class PartDischarge extends Component {
                         newOrderList.splice(i, 1);
                         this.setState({ orderList: newOrderList })
                     }
-
                 }
                 for (i = 0; i < this.state.trailerIds.length; i++) {
                     valid = false;

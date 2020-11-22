@@ -10,15 +10,16 @@ const abi = $abi.abi
 const contract_address = $abi.contract_address
 const publicKey = $abi.publicKey
 const privateKey = $abi.privateKey
+const infuraAPI = $abi.Infura_api
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
 
-const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
+const Provider = new HDWalletProvider(mnemonic, infuraAPI);
 const web3 = new Web3(Provider);
-const contract = new web3.eth.Contract(abi, contract_address);
-web3.eth.defaultAccount = '0x653fbbf28aDDBf0b0526026e238eF42C377d62DC';
+const contract = new web3.eth.Contract(abi, contract_address, {from: publicKey});
+web3.eth.defaultAccount = publicKey;
 
 const AsyncAlert = (Title, message) => {
     return new Promise((resolve, reject) => {
@@ -137,11 +138,14 @@ async register_product(UPC, Weight, Volume) {
 
 	const data = contract.methods.register_product(UPC, Weight, Volume).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -155,7 +159,10 @@ async register_product(UPC, Weight, Volume) {
 		}catch(error){
 			if (error.toString().includes("product already registered")) {
 				  Alert.alert('Error','this product was already registered:\nUPC: ' + UPC);
-			} 
+			}
+			else{
+				Alert.alert("Error:", error.toString())
+			}
 		}
 	}
 }
@@ -163,11 +170,14 @@ async Associate_order_to_unique_product(UPC, UniquenessID) {
 
 	const data = contract.methods.Associate_order_to_unique_product(UPC, UniquenessID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -190,6 +200,9 @@ async Associate_order_to_unique_product(UPC, UniquenessID) {
 			else if(error.toString().includes("must be a product registered")){
 				Alert.alert('Error: product not registered','UPC: ' + UPC);
 			}
+			else{
+				Alert.alert("Error:", error.toString())
+			}
 			return false;
 		}
 	}
@@ -205,11 +218,14 @@ async Associate_itinerary_to_order(UPC, UniquenessID){
 
 	const data = contract.methods.Associate_itinerary_to_order(orderID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -223,7 +239,6 @@ async Associate_itinerary_to_order(UPC, UniquenessID){
 			return true;
 			
 		}catch(error){
-			console.log(error);
 			Alert.alert('Error: ', 'order ID: ' + orderID + '\nItinerary ID: ' + this.state.ItineraryID);
 		}
 	}
@@ -233,11 +248,14 @@ async Associate_trailer_to_itinerary(trailerID){
 
 	const data = contract.methods.Associate_trailer_to_itinerary(trailerID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -251,7 +269,6 @@ async Associate_trailer_to_itinerary(trailerID){
 			return true;
 			
 		}catch(error){
-			console.log(error);
 			Alert.alert('Error', 'could not added trailerID to Itinerary\n' + "trailer ID: "+ trailerID + '\nItinerary ID: ' + this.state.ItineraryID);
 		}
 	}
@@ -263,11 +280,14 @@ async grab_Itinerary(trailerID){
 
 	const data = contract.methods.grab_Itinerary(ItineraryID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -281,7 +301,6 @@ async grab_Itinerary(trailerID){
 			return true;
 			
 		}catch(error){
-			console.log(error);
 			Alert.alert('Error', 'could not grabed this Itinerary\n' + "Itinerary ID: "+ ItineraryID + '\nTrailer ID: ' + trailerID);
 		}
 	}
@@ -292,11 +311,14 @@ async Itinerary_start(co2Emission, truckID){
 
 	const data = contract.methods.Itinerary_start(co2Emission, truckID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -310,7 +332,6 @@ async Itinerary_start(co2Emission, truckID){
 			return true;
 			
 		}catch(error){
-			console.log(error);
 			Alert.alert('Error', 'Itinerary could not started\n' + "Itinerary ID: "+ ItineraryID + '\ntruck ID: ' + truckID);
 		}
 	}
@@ -322,11 +343,14 @@ async Itinerary_stop(co2Emission, truckID){
 
 	const data = contract.methods.Itinerary_stop(co2Emission, truckID).encodeABI();
 	const nonce = await web3.eth.getTransactionCount(publicKey);
+	var gasPrice = await web3.eth.getGasPrice();
+	var gasLimit = await web3.eth.getBlock("latest", false);
+
 	const signedTx = await web3.eth.accounts.signTransaction(
 		{
 			nonce: nonce,
-			gasLimit: '0x200710',
-			gasPrice: '0x0A',
+			gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+			gasPrice: '0x' + parseInt(gasPrice).toString(16),
 			to: contract_address,
 			data: data,
 		},
@@ -342,7 +366,6 @@ async Itinerary_stop(co2Emission, truckID){
 			return true;
 			
 		}catch(error){
-			console.log(error);
 			Alert.alert('Error', 'Itinerary could not be stoped\n' + "Itinerary ID: "+ ItineraryID + '\nTruck ID: ' + truckID);
 		}
 	}

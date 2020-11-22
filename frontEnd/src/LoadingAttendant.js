@@ -13,13 +13,15 @@ const abi = $abi.abi
 const contract_address = $abi.contract_address
 const publicKey = $abi.publicKey
 const privateKey = $abi.privateKey
+const infuraAPI = $abi.Infura_api
 
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
 
-const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
+const Provider = new HDWalletProvider(mnemonic, infuraAPI);
 const web3 = new Web3(Provider);
-const contract = new web3.eth.Contract(abi, contract_address);
+const contract = new web3.eth.Contract(abi, contract_address, {from: publicKey});
+web3.eth.defaultAccount = publicKey;
 
 const Separator = () => (
 	<View style={styles.separator} />
@@ -126,6 +128,7 @@ export default class LoadingAttendant extends Component {
 
 	async componentDidMount() {
 		var ItineraryID = await contract.methods.get_current_ItineraryID().call();
+		console.log(ItineraryID)
 		await this.get_Itinerary_info(ItineraryID, false);
 		this.setState({ ItineraryID: ItineraryID });
 	}
@@ -134,11 +137,14 @@ export default class LoadingAttendant extends Component {
 
 		const data = contract.methods.init_itinerary().encodeABI();
 		const nonce = await web3.eth.getTransactionCount(publicKey);
+		var gasPrice = await web3.eth.getGasPrice();
+		var gasLimit = await web3.eth.getBlock("latest", false);
+	
 		const signedTx = await web3.eth.accounts.signTransaction(
 			{
 				nonce: nonce,
-				gasLimit: '0x200710',
-				gasPrice: '0x0A',
+				gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+				gasPrice: '0x' + parseInt(gasPrice).toString(16),
 				to: contract_address,
 				data: data,
 			},
@@ -157,6 +163,9 @@ export default class LoadingAttendant extends Component {
 			} catch (error) {
 				if (error.toString().includes("already have an open Itinerary")) {
 					Alert.alert('Error: user already have an open Itinerary', 'open Itinerary ID: ' + this.state.ItineraryID);
+				}
+				else{
+					Alert.alert("Error:", error.toString())
 				}
 			}
 		}
@@ -188,15 +197,19 @@ export default class LoadingAttendant extends Component {
 					Alert.alert('Error: IPFS Storing did not work', 'ItineraryID: ' + this.state.ItineraryID);
 					return -1;
 				}
+				
 			}
 
 			const data = contract.methods.loading_completed(hash).encodeABI();
 			const nonce = await web3.eth.getTransactionCount(publicKey);
+			var gasPrice = await web3.eth.getGasPrice();
+			var gasLimit = await web3.eth.getBlock("latest", false);
+		
 			const signedTx = await web3.eth.accounts.signTransaction(
 				{
 					nonce: nonce,
-					gasLimit: '0x200710',
-					gasPrice: '0x0A',
+					gasLimit: '0x' + gasLimit.gasLimit.toString(16),
+					gasPrice: '0x' + parseInt(gasPrice).toString(16),
 					to: contract_address,
 					data: data,
 				},
@@ -215,6 +228,9 @@ export default class LoadingAttendant extends Component {
 				}
 				else if(error.toString().includes("a trailer must be assigned")){
 					Alert.alert('Error: You need to assign a trailer', 'Itinerary ID: ' + this.state.ItineraryID);
+				}
+				else{
+					Alert.alert("Error:", error.toString())
 				}
 			}
 		}

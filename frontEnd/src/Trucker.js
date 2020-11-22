@@ -7,15 +7,17 @@ const $abi = require('./ABI_and_keys')
 const mnemonic = $abi.mnemonic
 const abi = $abi.abi
 const contract_address = $abi.contract_address
+const infuraAPI = $abi.Infura_api
+const publicKey = $abi.publicKey
 
 const Web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 import HDWalletProvider from 'truffle-hdwallet-provider';
 
-const Provider = new HDWalletProvider(mnemonic, 'http://192.168.0.16:7545');
+const Provider = new HDWalletProvider(mnemonic, infuraAPI);
 const web3 = new Web3(Provider);
-const contract = new web3.eth.Contract(abi, contract_address);
-
+const contract = new web3.eth.Contract(abi, contract_address, {from: publicKey});
+web3.eth.defaultAccount = publicKey;
 const Separator = () => (
 	<View style={styles.separator} />
 );
