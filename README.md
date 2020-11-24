@@ -11,7 +11,7 @@ https://kovan.etherscan.io/address/0x42d252C728739DF6ba95F739ff9C1AD4DF006Df2
 
 1) clone the repo
 2) in a command line located in root/frontend, enter npm install
-3) in root/frontend/ABI_and_keys.js enter your Kovan mnemonic, private, and public keys (must be an hdwallet)
+3) in root/frontend/ABI_and_keys.js enter your Kovan mnemonic, private, and public keys for all 3 users (can be the same for all users and it must be an hdwallet)
 4) connect your phone to your computer
 5) in a command line located in root/frontend, enter react-native start
 6) in another command line located in root/frontend, enter react-native run-android
