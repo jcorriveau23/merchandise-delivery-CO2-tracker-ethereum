@@ -1,3 +1,8 @@
+# CO2_Merchandise_Transportation_Tracker
+
+Proof of concept of DAPP on Ethereum that track carbon footprint of merchandise transportation base on product weight and volume.
+The goal is to internalize itineraries emissions on products directly.
+
 # Contract deployed on Kovan test Network
 
 https://kovan.etherscan.io/address/0x42d252C728739DF6ba95F739ff9C1AD4DF006Df2
@@ -15,12 +20,6 @@ Now you should be able to participated in the contract, you can use QR codes loc
 
 See demo of how to use the app:
 https://www.youtube.com/watch?v=TZ-BCY8ahPA&t=240s
-
-# CO2_Merchandise_Transportation_Tracker
-
-Proof of concept of DAPP on Ethereum that track carbon footprint of merchandise transportation.
-The goal is to internalize itineraries emissions on products.
-
 
 # Structure of the system:
 
