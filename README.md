@@ -1,4 +1,4 @@
-# CO2_Merchandise_Transportation_Tracker
+# merchandise-delivery-CO2-tracker-ethereum
 
 Proof of concept of a DAPP on Ethereum that track the carbon footprint of merchandise delivery base on products weight and volume.
 The goal is to internalize itineraries emissions on products directly.
